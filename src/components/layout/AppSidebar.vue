@@ -17,8 +17,8 @@ const navItems = [
 
 <template>
   <aside
-    class="flex h-full shrink-0 flex-col overflow-hidden bg-pine-dark px-4 py-5 text-ink-dark-text transition-[width] duration-200 ease-in-out"
-    :class="isCollapsed ? 'w-16 px-2' : 'w-56'">
+    class="flex h-full shrink-0 flex-col overflow-hidden bg-pine-dark py-5 text-ink-dark-text transition-[width] duration-200 ease-in-out"
+    :class="isCollapsed ? 'w-16 px-2' : 'w-56 px-4'">
     <div class="mb-8 flex items-center justify-between gap-2 px-1">
       <span v-if="!isCollapsed" class="min-w-0 truncate font-display text-[1.6rem] italic leading-none text-white">
         {{ t('nav.brand') }}

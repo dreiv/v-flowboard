@@ -22,6 +22,7 @@ const variants: Record<string, string> = {
   ghost:
     'text-ink-soft hover:bg-paper-dim',
   'danger-ghost': 'text-mist hover:text-urgent',
+  link: 'text-link hover:underline',
 }
 
 const sizes: Record<string, string> = {

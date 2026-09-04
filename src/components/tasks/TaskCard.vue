@@ -22,8 +22,9 @@ const { t } = useI18n()
 </script>
 
 <template>
-  <article class="group flex gap-2 rounded-standard border border-mist-light bg-surface p-3 transition-shadow"
-    :class="variant === 'list' ? 'items-start' : 'flex-col'" :aria-label="task.title">
+  <article
+    class="group flex items-start gap-2 rounded-standard border border-mist-light bg-surface p-3 transition-shadow"
+    :aria-label="task.title">
     <span v-if="draggable" class="drag-handle mt-0.5 shrink-0 cursor-grab select-none text-mist-light"
       aria-hidden="true">
       ⠿
@@ -40,14 +41,13 @@ const { t } = useI18n()
 
       <div
         class="mt-2 flex items-center gap-3 transition-opacity md:opacity-0 md:group-hover:opacity-100 md:focus-within:opacity-100">
-        <BaseButton variant="ghost" size="sm" class="px-0! text-link hover:underline" @click="emit('edit', task)">
+        <BaseButton variant="link" size="sm" class="px-0!" @click="emit('edit', task)">
           {{ t('tasks.card.edit') }}
         </BaseButton>
         <BaseSelect class="w-auto!" :model-value="task.laneId" :aria-label="t('tasks.card.changeLane')"
           :options="lanes.map((l) => ({ value: l.id, label: l.name }))"
           @update:model-value="(laneId) => emit('changeLane', task.id, laneId)" />
-        <BaseButton variant="ghost" size="sm" class="px-0! text-mist hover:text-urgent"
-          @click="emit('delete', task.id)">
+        <BaseButton variant="danger-ghost" size="sm" class="px-0!" @click="emit('delete', task.id)">
           {{ t('tasks.card.delete') }}
         </BaseButton>
       </div>
