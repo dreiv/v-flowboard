@@ -1,8 +1,8 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import { i18n } from '@/i18n'
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHashHistory('/v-todo/'),
   routes: [
     { path: '/', redirect: '/tasks' },
     {
