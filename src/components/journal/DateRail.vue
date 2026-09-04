@@ -1,9 +1,14 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useJournalStore } from '@/stores/journal'
 import { formatDateShort, todayKey, toDateKey } from '@/lib/utils'
+import IconButton from '@/components/ui/IconButton.vue'
+import BaseButton from '@/components/ui/BaseButton.vue'
+import BaseInput from '@/components/ui/BaseInput.vue'
 
 const store = useJournalStore()
+const { t } = useI18n()
 
 const today = todayKey()
 
@@ -27,46 +32,32 @@ function shiftDay(delta: number) {
 <template>
   <div class="flex w-64 shrink-0 flex-col border-r border-mist-light pr-4 dark:border-ink-dark-border">
     <div class="mb-4 flex items-center gap-1">
-      <button
-        type="button"
-        class="rounded-standard px-2 py-1 text-sm text-ink-soft hover:bg-paper-dim dark:text-ink-dark-text-soft dark:hover:bg-ink-dark-surface-2"
-        aria-label="Previous day"
-        @click="shiftDay(-1)"
-      >
-        ‹
-      </button>
-      <button
-        type="button"
-        class="flex-1 rounded-standard px-2 py-1 text-center text-sm font-medium text-pine hover:bg-pine-light dark:text-pine-light dark:hover:bg-ink-dark-surface-2"
+      <IconButton :aria-label="t('journal.sidebar.previousDay')" @click="shiftDay(-1)">‹</IconButton>
+      <BaseButton
+        variant="ghost"
+        class="flex-1 text-center font-medium text-pine dark:text-pine-light"
         @click="goToToday"
       >
-        Today
-      </button>
-      <button
-        type="button"
-        class="rounded-standard px-2 py-1 text-sm text-ink-soft hover:bg-paper-dim dark:text-ink-dark-text-soft dark:hover:bg-ink-dark-surface-2"
-        aria-label="Next day"
-        @click="shiftDay(1)"
-      >
-        ›
-      </button>
+        {{ t('journal.sidebar.today') }}
+      </BaseButton>
+      <IconButton :aria-label="t('journal.sidebar.nextDay')" @click="shiftDay(1)">›</IconButton>
     </div>
 
     <label for="journal-date-picker" class="mb-1 text-xs font-medium text-ink-soft dark:text-ink-dark-text-soft">
-      Jump to date
+      {{ t('journal.sidebar.jumpToDate') }}
     </label>
-    <input
+    <BaseInput
       id="journal-date-picker"
       type="date"
-      :value="store.selectedDate"
-      class="mb-4 rounded-standard border border-mist-light bg-paper px-2 py-1.5 text-sm text-ink outline-none focus:border-pine dark:border-ink-dark-border dark:bg-ink-dark-surface-2 dark:text-ink-dark-text"
-      @change="store.selectDate(($event.target as HTMLInputElement).value)"
+      class="mb-4"
+      :model-value="store.selectedDate"
+      @update:model-value="store.selectDate"
     />
 
     <p class="mb-2 text-xs font-medium uppercase tracking-wide text-mist dark:text-ink-dark-text-soft">
-      Entries
+      {{ t('journal.sidebar.entriesHeading') }}
     </p>
-    <nav class="flex flex-col gap-0.5 overflow-y-auto" aria-label="Journal entries by date">
+    <nav class="flex flex-col gap-0.5 overflow-y-auto" :aria-label="t('journal.sidebar.entriesNav')">
       <button
         v-for="date in recentDates"
         :key="date"
@@ -84,7 +75,9 @@ function shiftDay(delta: number) {
           {{ formatDateShort(date) }}
         </span>
       </button>
-      <p v-if="recentDates.length === 0" class="px-2 py-1.5 text-xs text-mist">No entries yet.</p>
+      <p v-if="recentDates.length === 0" class="px-2 py-1.5 text-xs text-mist">
+        {{ t('journal.sidebar.noEntries') }}
+      </p>
     </nav>
   </div>
 </template>

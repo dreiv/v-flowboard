@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import draggable from 'vuedraggable'
+import { useI18n } from 'vue-i18n'
 import type { Lane, Task } from '@/types/task'
 import TaskCard from '@/components/tasks/TaskCard.vue'
+import BaseInput from '@/components/ui/BaseInput.vue'
+import BaseButton from '@/components/ui/BaseButton.vue'
+import IconButton from '@/components/ui/IconButton.vue'
 
 const props = defineProps<{
   lane: Lane
@@ -19,7 +23,10 @@ const emit = defineEmits<{
   rename: [id: string, name: string]
   remove: [id: string]
   addTask: [laneId: string]
+  announce: [message: string]
 }>()
+
+const { t } = useI18n()
 
 const localTasks = computed({
   get: () => props.tasks,
@@ -31,6 +38,21 @@ const localTasks = computed({
     )
   },
 })
+
+function onDragEnd(e: { newIndex?: number; item?: { __draggable_context?: { element: Task } } }) {
+  if (e.newIndex === undefined) return
+  const task = props.tasks[e.newIndex]
+  if (!task) return
+  emit(
+    'announce',
+    t('tasks.a11y.reorderAnnounce', {
+      title: task.title,
+      position: e.newIndex + 1,
+      total: props.tasks.length,
+      lane: props.lane.name,
+    }),
+  )
+}
 
 const isRenaming = ref(false)
 const renameValue = ref(props.lane.name)
@@ -49,15 +71,14 @@ function commitRename() {
 </script>
 
 <template>
-  <div class="flex w-72 shrink-0 flex-col border-l-2 border-pine/60 pl-3 dark:border-pine/40">
+  <section class="flex w-72 shrink-0 flex-col border-l-2 border-pine/60 pl-3 dark:border-pine/40" :aria-label="lane.name">
     <div class="mb-3 flex items-center justify-between gap-2">
       <div class="min-w-0 flex-1">
-        <input
+        <BaseInput
           v-if="isRenaming"
           v-model="renameValue"
-          type="text"
           autofocus
-          class="w-full rounded-standard border border-pine bg-paper px-1.5 py-0.5 text-sm font-medium text-ink outline-none dark:bg-ink-dark-surface-2 dark:text-ink-dark-text"
+          class="!py-0.5 !text-sm font-medium"
           @keydown.enter="commitRename"
           @keydown.esc="isRenaming = false"
           @blur="commitRename"
@@ -74,15 +95,14 @@ function commitRename() {
         </button>
       </div>
       <span class="shrink-0 text-xs text-mist dark:text-ink-dark-text-soft">{{ tasks.length }}</span>
-      <button
+      <IconButton
         v-if="!lane.isDefault"
-        type="button"
-        class="shrink-0 text-xs text-mist hover:text-urgent"
-        aria-label="Delete lane"
+        class="!px-0 shrink-0 text-xs hover:text-urgent"
+        :aria-label="t('tasks.board.deleteLaneNamed', { name: lane.name })"
         @click="emit('remove', lane.id)"
       >
         ✕
-      </button>
+      </IconButton>
     </div>
 
     <draggable
@@ -93,26 +113,31 @@ function commitRename() {
       handle=".drag-handle"
       ghost-class="opacity-40"
       class="flex min-h-[3rem] flex-1 flex-col gap-2"
+      role="list"
+      :aria-label="lane.name"
+      @end="onDragEnd"
     >
       <template #item="{ element }">
-        <TaskCard
-          :task="element"
-          :lanes="lanes"
-          :draggable="dragEnabled"
-          variant="card"
-          @edit="emit('edit', $event)"
-          @delete="emit('delete', $event)"
-          @change-lane="(id, laneId) => emit('changeLane', id, laneId)"
-        />
+        <div role="listitem">
+          <TaskCard
+            :task="element"
+            :lanes="lanes"
+            :draggable="dragEnabled"
+            variant="card"
+            @edit="emit('edit', $event)"
+            @delete="emit('delete', $event)"
+            @change-lane="(id, laneId) => emit('changeLane', id, laneId)"
+          />
+        </div>
       </template>
     </draggable>
 
-    <button
-      type="button"
-      class="mt-2 rounded-standard border border-dashed border-mist-light py-2 text-xs font-medium text-mist transition-colors hover:border-pine hover:text-pine dark:border-ink-dark-border"
+    <BaseButton
+      variant="secondary"
+      class="mt-2 !w-full border-dashed !py-2 text-xs hover:border-pine hover:text-pine"
       @click="emit('addTask', lane.id)"
     >
-      + Add task
-    </button>
-  </div>
+      {{ t('tasks.board.addTaskToLane') }}
+    </BaseButton>
+  </section>
 </template>

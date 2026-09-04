@@ -1,0 +1,1495 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+components/
+  journal/
+    DateRail.vue
+    JournalEditor.vue
+  layout/
+    AppSidebar.vue
+    ModalDialog.vue
+  tasks/
+    KanbanBoard.vue
+    LaneColumn.vue
+    PriorityBadge.vue
+    TaskCard.vue
+    TaskFormModal.vue
+    TaskListView.vue
+lib/
+  utils.ts
+router/
+  index.ts
+stores/
+  counter.ts
+  journal.ts
+  task.ts
+types/
+  journal.ts
+  task.ts
+views/
+  JournalView.vue
+  TasksView.vue
+App.vue
+main.ts
+style.css
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="components/journal/DateRail.vue">
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useJournalStore } from '@/stores/journal'
+import { formatDateShort, todayKey, toDateKey } from '@/lib/utils'
+
+const store = useJournalStore()
+
+const today = todayKey()
+
+const recentDates = computed(() => {
+  const fromEntries = store.entriesByDateDesc.map((e) => e.date)
+  if (fromEntries.includes(today)) return fromEntries
+  return [today, ...fromEntries]
+})
+
+function goToToday() {
+  store.selectDate(today)
+}
+
+function shiftDay(delta: number) {
+  const [y, m, d] = store.selectedDate.split('-').map(Number)
+  const next = new Date(y, m - 1, d + delta)
+  store.selectDate(toDateKey(next))
+}
+</script>
+
+<template>
+  <div class="flex w-64 shrink-0 flex-col border-r border-mist-light pr-4 dark:border-ink-dark-border">
+    <div class="mb-4 flex items-center gap-1">
+      <button
+        type="button"
+        class="rounded-standard px-2 py-1 text-sm text-ink-soft hover:bg-paper-dim dark:text-ink-dark-text-soft dark:hover:bg-ink-dark-surface-2"
+        aria-label="Previous day"
+        @click="shiftDay(-1)"
+      >
+        ‹
+      </button>
+      <button
+        type="button"
+        class="flex-1 rounded-standard px-2 py-1 text-center text-sm font-medium text-pine hover:bg-pine-light dark:text-pine-light dark:hover:bg-ink-dark-surface-2"
+        @click="goToToday"
+      >
+        Today
+      </button>
+      <button
+        type="button"
+        class="rounded-standard px-2 py-1 text-sm text-ink-soft hover:bg-paper-dim dark:text-ink-dark-text-soft dark:hover:bg-ink-dark-surface-2"
+        aria-label="Next day"
+        @click="shiftDay(1)"
+      >
+        ›
+      </button>
+    </div>
+
+    <label for="journal-date-picker" class="mb-1 text-xs font-medium text-ink-soft dark:text-ink-dark-text-soft">
+      Jump to date
+    </label>
+    <input
+      id="journal-date-picker"
+      type="date"
+      :value="store.selectedDate"
+      class="mb-4 rounded-standard border border-mist-light bg-paper px-2 py-1.5 text-sm text-ink outline-none focus:border-pine dark:border-ink-dark-border dark:bg-ink-dark-surface-2 dark:text-ink-dark-text"
+      @change="store.selectDate(($event.target as HTMLInputElement).value)"
+    />
+
+    <p class="mb-2 text-xs font-medium uppercase tracking-wide text-mist dark:text-ink-dark-text-soft">
+      Entries
+    </p>
+    <nav class="flex flex-col gap-0.5 overflow-y-auto" aria-label="Journal entries by date">
+      <button
+        v-for="date in recentDates"
+        :key="date"
+        type="button"
+        class="rounded-standard px-2 py-1.5 text-left text-sm transition-colors"
+        :class="
+          date === store.selectedDate
+            ? 'bg-pine-light text-pine-dark dark:bg-ink-dark-surface-2 dark:text-pine-light'
+            : 'text-ink-soft hover:bg-paper-dim dark:text-ink-dark-text-soft dark:hover:bg-ink-dark-surface-2'
+        "
+        @click="store.selectDate(date)"
+      >
+        <span class="inline-flex items-center gap-1.5">
+          <span v-if="date === today" class="h-1.5 w-1.5 shrink-0 rounded-full bg-clay" aria-hidden="true" />
+          {{ formatDateShort(date) }}
+        </span>
+      </button>
+      <p v-if="recentDates.length === 0" class="px-2 py-1.5 text-xs text-mist">No entries yet.</p>
+    </nav>
+  </div>
+</template>
+</file>
+
+<file path="components/journal/JournalEditor.vue">
+<script setup lang="ts">
+import { ref, watch } from 'vue'
+import { useDebounceFn } from '@vueuse/core'
+import { useJournalStore } from '@/stores/journal'
+import { formatDateLabel } from '@/lib/utils'
+
+const store = useJournalStore()
+
+const draft = ref('')
+const saveState = ref<'saved' | 'pending'>('saved')
+
+function loadDraftFor(date: string) {
+  draft.value = store.entryForDate(date)?.content ?? ''
+  saveState.value = 'saved'
+}
+
+watch(() => store.selectedDate, loadDraftFor, { immediate: true })
+
+const debouncedSave = useDebounceFn((date: string, content: string) => {
+  store.saveEntry(date, content)
+  saveState.value = 'saved'
+}, 600)
+
+function handleInput() {
+  saveState.value = 'pending'
+  debouncedSave(store.selectedDate, draft.value)
+}
+</script>
+
+<template>
+  <div class="flex flex-1 flex-col px-8 py-6">
+    <div class="mb-4 flex items-baseline justify-between">
+      <h2 class="font-display text-2xl text-ink dark:text-ink-dark-text">
+        {{ formatDateLabel(store.selectedDate) }}
+      </h2>
+      <span class="text-xs text-mist dark:text-ink-dark-text-soft">
+        {{ saveState === 'saved' ? 'Saved to this device' : 'Saving…' }}
+      </span>
+    </div>
+
+    <textarea
+      v-model="draft"
+      placeholder="Write about your day..."
+      class="min-h-[60vh] flex-1 resize-none rounded-standard border border-mist-light bg-surface p-4 text-[0.95rem] leading-relaxed text-ink outline-none focus:border-pine dark:border-ink-dark-border dark:bg-ink-dark-surface dark:text-ink-dark-text"
+      @input="handleInput"
+    />
+  </div>
+</template>
+</file>
+
+<file path="components/layout/AppSidebar.vue">
+<script setup lang="ts">
+import { useDark, useToggle } from '@vueuse/core'
+import { RouterLink, useRoute } from 'vue-router'
+
+const isDark = useDark({
+  selector: 'html',
+  attribute: 'class',
+  valueDark: 'dark',
+  valueLight: '',
+})
+const toggleDark = useToggle(isDark)
+
+const route = useRoute()
+
+const navItems = [
+  { to: '/tasks', label: 'Tasks', match: 'tasks' },
+  { to: '/journal', label: 'Journal', match: 'journal' },
+]
+</script>
+
+<template>
+  <aside
+    class="flex h-full w-56 shrink-0 flex-col bg-pine-dark px-4 py-5 text-ink-dark-text"
+  >
+    <div class="mb-8 px-1">
+      <span class="font-display text-[1.6rem] italic leading-none text-white">Flowboard</span>
+      <p class="mt-1 text-xs text-ink-dark-text-soft">Tasks &amp; daily notes</p>
+    </div>
+
+    <nav class="flex flex-1 flex-col gap-1" aria-label="Primary">
+      <RouterLink
+        v-for="item in navItems"
+        :key="item.to"
+        :to="item.to"
+        class="rounded-standard px-3 py-2 text-sm font-medium transition-colors"
+        :class="
+          route.name === item.match
+            ? 'bg-white/10 text-white'
+            : 'text-ink-dark-text-soft hover:bg-white/5 hover:text-white'
+        "
+      >
+        {{ item.label }}
+      </RouterLink>
+    </nav>
+
+    <button
+      type="button"
+      class="mt-4 flex items-center justify-between rounded-standard border border-white/10 px-3 py-2 text-sm text-ink-dark-text-soft transition-colors hover:text-white"
+      @click="toggleDark()"
+    >
+      <span>{{ isDark ? 'Dark mode' : 'Light mode' }}</span>
+      <span
+        class="relative h-4 w-8 rounded-full transition-colors"
+        :class="isDark ? 'bg-pine' : 'bg-white/20'"
+      >
+        <span
+          class="absolute top-0.5 h-3 w-3 rounded-full bg-white transition-transform"
+          :class="isDark ? 'translate-x-4' : 'translate-x-0.5'"
+        />
+      </span>
+    </button>
+  </aside>
+</template>
+</file>
+
+<file path="components/layout/ModalDialog.vue">
+<script setup lang="ts">
+import { onMounted, onUnmounted } from 'vue'
+
+const props = defineProps<{ title: string }>()
+const emit = defineEmits<{ close: [] }>()
+
+function onKeydown(e: KeyboardEvent) {
+  if (e.key === 'Escape') emit('close')
+}
+
+onMounted(() => document.addEventListener('keydown', onKeydown))
+onUnmounted(() => document.removeEventListener('keydown', onKeydown))
+</script>
+
+<template>
+  <Teleport to="body">
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 p-4" @click.self="emit('close')">
+      <div
+        class="w-full max-w-md rounded-standard border border-mist-light bg-surface p-5 shadow-xl dark:border-ink-dark-border dark:bg-ink-dark-surface"
+        role="dialog"
+        aria-modal="true"
+        :aria-label="props.title"
+      >
+        <div class="mb-4 flex items-center justify-between">
+          <h2 class="font-display text-lg text-ink dark:text-ink-dark-text">{{ props.title }}</h2>
+          <button
+            type="button"
+            class="rounded-standard px-2 py-1 text-mist hover:bg-paper-dim hover:text-ink dark:hover:bg-ink-dark-surface-2 dark:hover:text-ink-dark-text"
+            aria-label="Close"
+            @click="emit('close')"
+          >
+            ✕
+          </button>
+        </div>
+        <slot />
+      </div>
+    </div>
+  </Teleport>
+</template>
+</file>
+
+<file path="components/tasks/KanbanBoard.vue">
+<script setup lang="ts">
+import { ref } from 'vue'
+import { useTaskStore } from '@/stores/task'
+import LaneColumn from '@/components/tasks/LaneColumn.vue'
+import type { Task } from '@/types/task'
+
+const store = useTaskStore()
+
+const emit = defineEmits<{
+  editTask: [task: Task]
+  addTask: [laneId: string]
+}>()
+
+const isAddingLane = ref(false)
+const newLaneName = ref('')
+
+function submitNewLane() {
+  if (newLaneName.value.trim()) {
+    store.createLane(newLaneName.value)
+  }
+  newLaneName.value = ''
+  isAddingLane.value = false
+}
+
+function handleDelete(id: string) {
+  store.deleteTask(id)
+}
+
+function handleChangeLane(id: string, laneId: string) {
+  store.moveTaskToLane(id, laneId)
+}
+
+function handleReorder(laneId: string, orderedIds: string[]) {
+  store.reorderLane(laneId, orderedIds)
+}
+
+function handleRename(id: string, name: string) {
+  store.renameLane(id, name)
+}
+
+function handleRemoveLane(id: string) {
+  store.deleteLane(id)
+}
+</script>
+
+<template>
+  <div>
+    <p
+      v-if="store.laneDeleteError"
+      class="mb-3 rounded-standard border border-urgent/30 bg-urgent-bg px-3 py-2 text-sm text-urgent"
+    >
+      {{ store.laneDeleteError }}
+      <button type="button" class="ml-2 underline" @click="store.clearLaneDeleteError()">
+        Dismiss
+      </button>
+    </p>
+
+    <div class="flex gap-4 overflow-x-auto pb-4">
+      <LaneColumn
+        v-for="lane in store.lanes"
+        :key="lane.id"
+        :lane="lane"
+        :lanes="store.lanes"
+        :tasks="store.tasksForLane(lane.id)"
+        :drag-enabled="store.sortMode === 'custom'"
+        @edit="emit('editTask', $event)"
+        @delete="handleDelete"
+        @change-lane="handleChangeLane"
+        @reorder="handleReorder"
+        @rename="handleRename"
+        @remove="handleRemoveLane"
+        @add-task="emit('addTask', $event)"
+      />
+
+      <div class="w-56 shrink-0">
+        <div v-if="isAddingLane" class="flex flex-col gap-2">
+          <input
+            v-model="newLaneName"
+            type="text"
+            autofocus
+            placeholder="Lane name"
+            class="rounded-standard border border-mist-light bg-paper px-2 py-1.5 text-sm outline-none focus:border-pine dark:border-ink-dark-border dark:bg-ink-dark-surface-2 dark:text-ink-dark-text"
+            @keydown.enter="submitNewLane"
+            @keydown.esc="isAddingLane = false"
+          />
+          <div class="flex gap-2">
+            <button
+              type="button"
+              class="rounded-standard bg-pine px-3 py-1 text-xs font-medium text-white hover:bg-pine-dark"
+              @click="submitNewLane"
+            >
+              Add
+            </button>
+            <button
+              type="button"
+              class="rounded-standard px-3 py-1 text-xs text-mist hover:bg-paper-dim"
+              @click="isAddingLane = false"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+        <button
+          v-else
+          type="button"
+          class="flex h-10 w-full items-center justify-center rounded-standard border border-dashed border-mist-light text-sm text-mist transition-colors hover:border-pine hover:text-pine dark:border-ink-dark-border"
+          @click="isAddingLane = true"
+        >
+          + New lane
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
+</file>
+
+<file path="components/tasks/LaneColumn.vue">
+<script setup lang="ts">
+import { computed, ref } from 'vue'
+import draggable from 'vuedraggable'
+import type { Lane, Task } from '@/types/task'
+import TaskCard from '@/components/tasks/TaskCard.vue'
+
+const props = defineProps<{
+  lane: Lane
+  lanes: Lane[]
+  tasks: Task[]
+  dragEnabled: boolean
+}>()
+
+const emit = defineEmits<{
+  edit: [task: Task]
+  delete: [id: string]
+  changeLane: [id: string, laneId: string]
+  reorder: [laneId: string, orderedIds: string[]]
+  rename: [id: string, name: string]
+  remove: [id: string]
+  addTask: [laneId: string]
+}>()
+
+const localTasks = computed({
+  get: () => props.tasks,
+  set: (value: Task[]) => {
+    emit(
+      'reorder',
+      props.lane.id,
+      value.map((t) => t.id),
+    )
+  },
+})
+
+const isRenaming = ref(false)
+const renameValue = ref(props.lane.name)
+
+function startRename() {
+  renameValue.value = props.lane.name
+  isRenaming.value = true
+}
+
+function commitRename() {
+  if (renameValue.value.trim()) {
+    emit('rename', props.lane.id, renameValue.value)
+  }
+  isRenaming.value = false
+}
+</script>
+
+<template>
+  <div class="flex w-72 shrink-0 flex-col border-l-2 border-pine/60 pl-3 dark:border-pine/40">
+    <div class="mb-3 flex items-center justify-between gap-2">
+      <div class="min-w-0 flex-1">
+        <input
+          v-if="isRenaming"
+          v-model="renameValue"
+          type="text"
+          autofocus
+          class="w-full rounded-standard border border-pine bg-paper px-1.5 py-0.5 text-sm font-medium text-ink outline-none dark:bg-ink-dark-surface-2 dark:text-ink-dark-text"
+          @keydown.enter="commitRename"
+          @keydown.esc="isRenaming = false"
+          @blur="commitRename"
+        />
+        <button
+          v-else
+          type="button"
+          class="truncate text-sm font-medium text-ink hover:underline dark:text-ink-dark-text"
+          :disabled="lane.isDefault"
+          :class="lane.isDefault ? 'cursor-default hover:no-underline' : ''"
+          @click="!lane.isDefault && startRename()"
+        >
+          {{ lane.name }}
+        </button>
+      </div>
+      <span class="shrink-0 text-xs text-mist dark:text-ink-dark-text-soft">{{ tasks.length }}</span>
+      <button
+        v-if="!lane.isDefault"
+        type="button"
+        class="shrink-0 text-xs text-mist hover:text-urgent"
+        aria-label="Delete lane"
+        @click="emit('remove', lane.id)"
+      >
+        ✕
+      </button>
+    </div>
+
+    <draggable
+      v-model="localTasks"
+      :group="{ name: 'tasks' }"
+      item-key="id"
+      :disabled="!dragEnabled"
+      handle=".drag-handle"
+      ghost-class="opacity-40"
+      class="flex min-h-[3rem] flex-1 flex-col gap-2"
+    >
+      <template #item="{ element }">
+        <TaskCard
+          :task="element"
+          :lanes="lanes"
+          :draggable="dragEnabled"
+          variant="card"
+          @edit="emit('edit', $event)"
+          @delete="emit('delete', $event)"
+          @change-lane="(id, laneId) => emit('changeLane', id, laneId)"
+        />
+      </template>
+    </draggable>
+
+    <button
+      type="button"
+      class="mt-2 rounded-standard border border-dashed border-mist-light py-2 text-xs font-medium text-mist transition-colors hover:border-pine hover:text-pine dark:border-ink-dark-border"
+      @click="emit('addTask', lane.id)"
+    >
+      + Add task
+    </button>
+  </div>
+</template>
+</file>
+
+<file path="components/tasks/PriorityBadge.vue">
+<script setup lang="ts">
+import type { Priority } from '@/types/task'
+import { PRIORITY_LABELS } from '@/types/task'
+
+const props = defineProps<{ priority: Priority; size?: 'sm' | 'md' }>()
+
+const colorClasses: Record<Priority, string> = {
+  urgent: 'bg-urgent-bg text-urgent dark:bg-urgent/20 dark:text-red-200',
+  high: 'bg-high-bg text-high dark:bg-high/20 dark:text-amber-200',
+  medium: 'bg-medium-bg text-medium dark:bg-medium/20 dark:text-blue-200',
+  low: 'bg-low-bg text-low dark:bg-low/20 dark:text-stone-200',
+}
+</script>
+
+<template>
+  <span
+    class="inline-flex items-center gap-1.5 rounded-standard font-medium"
+    :class="[
+      colorClasses[props.priority],
+      props.size === 'sm' ? 'px-1.5 py-0.5 text-[0.7rem]' : 'px-2 py-1 text-xs',
+    ]"
+  >
+    <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-current" />
+    {{ PRIORITY_LABELS[props.priority] }}
+  </span>
+</template>
+</file>
+
+<file path="components/tasks/TaskCard.vue">
+<script setup lang="ts">
+import type { Lane, Task } from '@/types/task'
+import PriorityBadge from '@/components/tasks/PriorityBadge.vue'
+
+const props = defineProps<{
+  task: Task
+  lanes: Lane[]
+  draggable?: boolean
+  variant?: 'list' | 'card'
+}>()
+
+const emit = defineEmits<{
+  edit: [task: Task]
+  delete: [id: string]
+  changeLane: [id: string, laneId: string]
+}>()
+</script>
+
+<template>
+  <div
+    class="group flex gap-2 rounded-standard border border-mist-light bg-surface p-3 transition-shadow dark:border-ink-dark-border dark:bg-ink-dark-surface"
+    :class="variant === 'list' ? 'items-start' : 'flex-col'"
+  >
+    <span
+      v-if="draggable"
+      class="drag-handle mt-0.5 shrink-0 cursor-grab select-none text-mist-light dark:text-ink-dark-border"
+      aria-hidden="true"
+    >
+      ⠿
+    </span>
+
+    <div class="min-w-0 flex-1">
+      <div class="flex items-start justify-between gap-2">
+        <p class="text-sm font-medium text-ink dark:text-ink-dark-text">{{ task.title }}</p>
+        <PriorityBadge :priority="task.priority" size="sm" />
+      </div>
+      <p
+        v-if="task.description"
+        class="mt-1 line-clamp-2 text-xs text-ink-soft dark:text-ink-dark-text-soft"
+      >
+        {{ task.description }}
+      </p>
+
+      <div class="mt-2 flex items-center gap-3 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
+        <button
+          type="button"
+          class="text-xs font-medium text-pine hover:underline dark:text-pine-light"
+          @click="emit('edit', task)"
+        >
+          Edit
+        </button>
+        <select
+          class="rounded-standard border border-mist-light bg-paper px-1.5 py-0.5 text-xs text-ink-soft dark:border-ink-dark-border dark:bg-ink-dark-surface-2 dark:text-ink-dark-text-soft"
+          :value="task.laneId"
+          aria-label="Change lane"
+          @change="emit('changeLane', task.id, ($event.target as HTMLSelectElement).value)"
+        >
+          <option v-for="lane in lanes" :key="lane.id" :value="lane.id">{{ lane.name }}</option>
+        </select>
+        <button
+          type="button"
+          class="text-xs font-medium text-mist hover:text-urgent"
+          @click="emit('delete', task.id)"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
+</file>
+
+<file path="components/tasks/TaskFormModal.vue">
+<script setup lang="ts">
+import { reactive, watch } from 'vue'
+import ModalDialog from '@/components/layout/ModalDialog.vue'
+import type { Lane, Priority, Task } from '@/types/task'
+
+const props = defineProps<{
+  lanes: Lane[]
+  editingTask?: Task | null
+  defaultLaneId?: string
+}>()
+
+const emit = defineEmits<{
+  close: []
+  submit: [
+    payload: { title: string; description?: string; priority: Priority; laneId: string },
+  ]
+}>()
+
+const form = reactive({
+  title: '',
+  description: '',
+  priority: 'medium' as Priority,
+  laneId: props.defaultLaneId ?? props.lanes[0]?.id ?? '',
+})
+
+watch(
+  () => props.editingTask,
+  (task) => {
+    if (task) {
+      form.title = task.title
+      form.description = task.description ?? ''
+      form.priority = task.priority
+      form.laneId = task.laneId
+    }
+  },
+  { immediate: true },
+)
+
+function handleSubmit() {
+  if (!form.title.trim()) return
+  emit('submit', {
+    title: form.title,
+    description: form.description || undefined,
+    priority: form.priority,
+    laneId: form.laneId,
+  })
+}
+</script>
+
+<template>
+  <ModalDialog :title="editingTask ? 'Edit task' : 'New task'" @close="emit('close')">
+    <form class="flex flex-col gap-4" @submit.prevent="handleSubmit">
+      <div>
+        <label for="task-title" class="mb-1 block text-xs font-medium text-ink-soft dark:text-ink-dark-text-soft">
+          Title
+        </label>
+        <input
+          id="task-title"
+          v-model="form.title"
+          type="text"
+          required
+          autofocus
+          placeholder="What needs doing?"
+          class="w-full rounded-standard border border-mist-light bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-pine dark:border-ink-dark-border dark:bg-ink-dark-surface-2 dark:text-ink-dark-text"
+        />
+      </div>
+
+      <div>
+        <label for="task-desc" class="mb-1 block text-xs font-medium text-ink-soft dark:text-ink-dark-text-soft">
+          Description <span class="text-mist">(optional)</span>
+        </label>
+        <textarea
+          id="task-desc"
+          v-model="form.description"
+          rows="3"
+          placeholder="Add more detail..."
+          class="w-full resize-none rounded-standard border border-mist-light bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-pine dark:border-ink-dark-border dark:bg-ink-dark-surface-2 dark:text-ink-dark-text"
+        />
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label for="task-priority" class="mb-1 block text-xs font-medium text-ink-soft dark:text-ink-dark-text-soft">
+            Priority
+          </label>
+          <select
+            id="task-priority"
+            v-model="form.priority"
+            class="w-full rounded-standard border border-mist-light bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-pine dark:border-ink-dark-border dark:bg-ink-dark-surface-2 dark:text-ink-dark-text"
+          >
+            <option value="urgent">Urgent</option>
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="task-lane" class="mb-1 block text-xs font-medium text-ink-soft dark:text-ink-dark-text-soft">
+            Lane
+          </label>
+          <select
+            id="task-lane"
+            v-model="form.laneId"
+            class="w-full rounded-standard border border-mist-light bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-pine dark:border-ink-dark-border dark:bg-ink-dark-surface-2 dark:text-ink-dark-text"
+          >
+            <option v-for="lane in lanes" :key="lane.id" :value="lane.id">{{ lane.name }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="mt-2 flex justify-end gap-2">
+        <button
+          type="button"
+          class="rounded-standard px-3 py-2 text-sm text-ink-soft hover:bg-paper-dim dark:text-ink-dark-text-soft dark:hover:bg-ink-dark-surface-2"
+          @click="emit('close')"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="rounded-standard bg-pine px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-pine-dark"
+        >
+          {{ editingTask ? 'Save changes' : 'Add task' }}
+        </button>
+      </div>
+    </form>
+  </ModalDialog>
+</template>
+</file>
+
+<file path="components/tasks/TaskListView.vue">
+<script setup lang="ts">
+import { computed } from 'vue'
+import draggable from 'vuedraggable'
+import { useTaskStore } from '@/stores/task'
+import TaskCard from '@/components/tasks/TaskCard.vue'
+import type { Task } from '@/types/task'
+
+const store = useTaskStore()
+
+const emit = defineEmits<{ editTask: [task: Task] }>()
+
+function laneName(laneId: string): string {
+  return store.lanes.find((l) => l.id === laneId)?.name ?? 'Unassigned'
+}
+
+// Group tasks by lane while preserving each lane's sort order, for list display.
+const groups = computed(() =>
+  store.lanes.map((lane) => ({
+    lane,
+    tasks: store.tasksForLane(lane.id),
+  })),
+)
+
+function handleLaneReorder(laneId: string, value: Task[]) {
+  store.reorderLane(
+    laneId,
+    value.map((t) => t.id),
+  )
+}
+
+function handleDelete(id: string) {
+  store.deleteTask(id)
+}
+
+function handleChangeLane(id: string, laneId: string) {
+  store.moveTaskToLane(id, laneId)
+}
+</script>
+
+<template>
+  <div class="flex flex-col gap-6">
+    <div v-if="store.tasks.length === 0" class="rounded-standard border border-dashed border-mist-light p-8 text-center text-sm text-mist dark:border-ink-dark-border">
+      No tasks yet. Add your first one to get moving.
+    </div>
+
+    <section v-for="group in groups" :key="group.lane.id">
+      <h3 class="mb-2 text-xs font-medium uppercase tracking-wide text-mist dark:text-ink-dark-text-soft">
+        {{ laneName(group.lane.id) }} · {{ group.tasks.length }}
+      </h3>
+      <draggable
+        :model-value="group.tasks"
+        :group="{ name: 'tasks' }"
+        item-key="id"
+        :disabled="store.sortMode !== 'custom'"
+        handle=".drag-handle"
+        ghost-class="opacity-40"
+        class="flex flex-col gap-2"
+        @update:model-value="(v: Task[]) => handleLaneReorder(group.lane.id, v)"
+      >
+        <template #item="{ element }">
+          <TaskCard
+            :task="element"
+            :lanes="store.lanes"
+            :draggable="store.sortMode === 'custom'"
+            variant="list"
+            @edit="emit('editTask', $event)"
+            @delete="handleDelete"
+            @change-lane="handleChangeLane"
+          />
+        </template>
+      </draggable>
+    </section>
+  </div>
+</template>
+</file>
+
+<file path="lib/utils.ts">
+/** Generates a reasonably unique id without pulling in an extra dependency. */
+export function makeId(): string {
+  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+    return crypto.randomUUID()
+  }
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`
+}
+
+/** Formats a Date as YYYY-MM-DD in the local timezone (not UTC). */
+export function toDateKey(date: Date): string {
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  const d = String(date.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
+}
+
+export function todayKey(): string {
+  return toDateKey(new Date())
+}
+
+/** Human-friendly label for a YYYY-MM-DD date key, e.g. "Thursday, 4 September". */
+export function formatDateLabel(dateKey: string): string {
+  const [y, m, d] = dateKey.split('-').map(Number)
+  const date = new Date(y, m - 1, d)
+  return date.toLocaleDateString(undefined, {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+  })
+}
+
+export function formatDateShort(dateKey: string): string {
+  const [y, m, d] = dateKey.split('-').map(Number)
+  const date = new Date(y, m - 1, d)
+  return date.toLocaleDateString(undefined, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  })
+}
+</file>
+
+<file path="router/index.ts">
+import { createRouter, createWebHistory } from 'vue-router'
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes: [
+    { path: '/', redirect: '/tasks' },
+    {
+      path: '/tasks',
+      name: 'tasks',
+      component: () => import('@/views/TasksView.vue'),
+    },
+    {
+      path: '/journal',
+      name: 'journal',
+      component: () => import('@/views/JournalView.vue'),
+    },
+    { path: '/:pathMatch(.*)*', redirect: '/tasks' },
+  ],
+})
+
+export default router
+</file>
+
+<file path="stores/counter.ts">
+import { ref, computed } from 'vue'
+import { defineStore } from 'pinia'
+
+export const useCounterStore = defineStore('counter', () => {
+  const count = ref(0)
+  const doubleCount = computed(() => count.value * 2)
+  function increment() {
+    count.value++
+  }
+
+  return { count, doubleCount, increment }
+})
+</file>
+
+<file path="stores/journal.ts">
+import { defineStore } from 'pinia'
+import { computed, ref } from 'vue'
+import { useStorage } from '@vueuse/core'
+import type { JournalEntry } from '@/types/journal'
+import { makeId, todayKey } from '@/lib/utils'
+
+export const useJournalStore = defineStore('journal', () => {
+  const entries = useStorage<JournalEntry[]>('flowboard.journal', [])
+  const selectedDate = ref<string>(todayKey())
+
+  const entriesByDateDesc = computed(() =>
+    [...entries.value].sort((a, b) => (a.date < b.date ? 1 : -1)),
+  )
+
+  const selectedEntry = computed(() => entries.value.find((e) => e.date === selectedDate.value))
+
+  function selectDate(date: string): void {
+    selectedDate.value = date
+  }
+
+  /** Fetches the entry for a date, or an empty draft if none exists yet. */
+  function entryForDate(date: string): JournalEntry | undefined {
+    return entries.value.find((e) => e.date === date)
+  }
+
+  /** Creates or updates the entry for a date with new content. */
+  function saveEntry(date: string, content: string): void {
+    const existing = entries.value.find((e) => e.date === date)
+    if (existing) {
+      existing.content = content
+      existing.updatedAt = new Date().toISOString()
+      return
+    }
+    if (content.trim() === '') return
+    const entry: JournalEntry = {
+      id: makeId(),
+      date,
+      content,
+      updatedAt: new Date().toISOString(),
+    }
+    entries.value.push(entry)
+  }
+
+  function deleteEntry(date: string): void {
+    entries.value = entries.value.filter((e) => e.date !== date)
+  }
+
+  return {
+    entries,
+    selectedDate,
+    entriesByDateDesc,
+    selectedEntry,
+    selectDate,
+    entryForDate,
+    saveEntry,
+    deleteEntry,
+  }
+})
+</file>
+
+<file path="stores/task.ts">
+import { defineStore } from 'pinia'
+import { computed, ref } from 'vue'
+import { useStorage } from '@vueuse/core'
+import type { Lane, Priority, SortMode, Task, TaskViewMode } from '@/types/task'
+import { PRIORITY_ORDER } from '@/types/task'
+import { makeId } from '@/lib/utils'
+
+const DEFAULT_LANES: Lane[] = [
+  { id: 'todo', name: 'To do', isDefault: true },
+  { id: 'doing', name: 'Doing', isDefault: true },
+  { id: 'done', name: 'Done', isDefault: true },
+]
+
+export const useTaskStore = defineStore('task', () => {
+  const lanes = useStorage<Lane[]>('flowboard.lanes', DEFAULT_LANES, undefined, {
+    mergeDefaults: false,
+  })
+  const tasks = useStorage<Task[]>('flowboard.tasks', [])
+
+  const sortMode = useStorage<SortMode>('flowboard.sortMode', 'custom')
+  const viewMode = useStorage<TaskViewMode>('flowboard.viewMode', 'kanban')
+
+  const laneDeleteError = ref<string | null>(null)
+
+  // ---- Derived data -------------------------------------------------
+
+  /** Tasks for a given lane, ordered according to the active sort mode. */
+  function tasksForLane(laneId: string): Task[] {
+    const inLane = tasks.value.filter((t) => t.laneId === laneId)
+    if (sortMode.value === 'priority') {
+      return [...inLane].sort((a, b) => {
+        const diff = PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority]
+        return diff !== 0 ? diff : a.order - b.order
+      })
+    }
+    return [...inLane].sort((a, b) => a.order - b.order)
+  }
+
+  const taskCountByLane = computed(() => {
+    const counts: Record<string, number> = {}
+    for (const lane of lanes.value) counts[lane.id] = 0
+    for (const task of tasks.value) counts[task.laneId] = (counts[task.laneId] ?? 0) + 1
+    return counts
+  })
+
+  const allTasksSorted = computed(() => {
+    if (sortMode.value === 'priority') {
+      return [...tasks.value].sort((a, b) => {
+        const diff = PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority]
+        return diff !== 0 ? diff : a.order - b.order
+      })
+    }
+    return [...tasks.value].sort((a, b) => a.order - b.order)
+  })
+
+  // ---- Task CRUD ------------------------------------------------------
+
+  function createTask(input: {
+    title: string
+    description?: string
+    priority: Priority
+    laneId: string
+  }): Task {
+    const laneTasks = tasks.value.filter((t) => t.laneId === input.laneId)
+    const maxOrder = laneTasks.reduce((max, t) => Math.max(max, t.order), -1)
+    const task: Task = {
+      id: makeId(),
+      title: input.title.trim(),
+      description: input.description?.trim() || undefined,
+      priority: input.priority,
+      laneId: input.laneId,
+      order: maxOrder + 1,
+      createdAt: new Date().toISOString(),
+    }
+    tasks.value.push(task)
+    return task
+  }
+
+  function updateTask(id: string, patch: Partial<Omit<Task, 'id' | 'createdAt'>>): void {
+    const task = tasks.value.find((t) => t.id === id)
+    if (!task) return
+    Object.assign(task, patch)
+  }
+
+  function deleteTask(id: string): void {
+    tasks.value = tasks.value.filter((t) => t.id !== id)
+  }
+
+  function moveTaskToLane(id: string, laneId: string): void {
+    const task = tasks.value.find((t) => t.id === id)
+    if (!task) return
+    const laneTasks = tasks.value.filter((t) => t.laneId === laneId && t.id !== id)
+    const maxOrder = laneTasks.reduce((max, t) => Math.max(max, t.order), -1)
+    task.laneId = laneId
+    task.order = maxOrder + 1
+  }
+
+  /** Replace the ordered task list for a lane after a drag-and-drop reorder. */
+  function reorderLane(laneId: string, orderedIds: string[]): void {
+    orderedIds.forEach((id, index) => {
+      const task = tasks.value.find((t) => t.id === id)
+      if (task) {
+        task.laneId = laneId
+        task.order = index
+      }
+    })
+  }
+
+  // ---- Lane CRUD ------------------------------------------------------
+
+  function createLane(name: string): Lane {
+    const lane: Lane = { id: makeId(), name: name.trim(), isDefault: false }
+    lanes.value.push(lane)
+    return lane
+  }
+
+  function renameLane(id: string, name: string): void {
+    const lane = lanes.value.find((l) => l.id === id)
+    if (lane) lane.name = name.trim()
+  }
+
+  function deleteLane(id: string): boolean {
+    const hasTasks = tasks.value.some((t) => t.laneId === id)
+    if (hasTasks) {
+      laneDeleteError.value = 'Move or delete every task in this lane before removing it.'
+      return false
+    }
+    lanes.value = lanes.value.filter((l) => l.id !== id)
+    laneDeleteError.value = null
+    return true
+  }
+
+  function clearLaneDeleteError(): void {
+    laneDeleteError.value = null
+  }
+
+  function setSortMode(mode: SortMode): void {
+    sortMode.value = mode
+  }
+
+  function setViewMode(mode: TaskViewMode): void {
+    viewMode.value = mode
+  }
+
+  return {
+    lanes,
+    tasks,
+    sortMode,
+    viewMode,
+    laneDeleteError,
+    tasksForLane,
+    taskCountByLane,
+    allTasksSorted,
+    createTask,
+    updateTask,
+    deleteTask,
+    moveTaskToLane,
+    reorderLane,
+    createLane,
+    renameLane,
+    deleteLane,
+    clearLaneDeleteError,
+    setSortMode,
+    setViewMode,
+  }
+})
+</file>
+
+<file path="types/journal.ts">
+export interface JournalEntry {
+  id: string
+  date: string // YYYY-MM-DD
+  content: string
+  updatedAt: string
+}
+</file>
+
+<file path="types/task.ts">
+export type Priority = 'low' | 'medium' | 'high' | 'urgent'
+
+export interface Task {
+  id: string
+  title: string
+  description?: string
+  priority: Priority
+  laneId: string
+  order: number
+  createdAt: string
+}
+
+export interface Lane {
+  id: string
+  name: string
+  isDefault: boolean
+}
+
+export type SortMode = 'custom' | 'priority'
+export type TaskViewMode = 'list' | 'kanban'
+
+export const PRIORITY_ORDER: Record<Priority, number> = {
+  urgent: 0,
+  high: 1,
+  medium: 2,
+  low: 3,
+}
+
+export const PRIORITY_LABELS: Record<Priority, string> = {
+  urgent: 'Urgent',
+  high: 'High',
+  medium: 'Medium',
+  low: 'Low',
+}
+</file>
+
+<file path="views/JournalView.vue">
+<script setup lang="ts">
+import DateRail from '@/components/journal/DateRail.vue'
+import JournalEditor from '@/components/journal/JournalEditor.vue'
+</script>
+
+<template>
+  <div class="flex h-full">
+    <div class="py-8 pl-8">
+      <DateRail />
+    </div>
+    <JournalEditor />
+  </div>
+</template>
+</file>
+
+<file path="views/TasksView.vue">
+<script setup lang="ts">
+import { ref } from 'vue'
+import { useTaskStore } from '@/stores/task'
+import KanbanBoard from '@/components/tasks/KanbanBoard.vue'
+import TaskListView from '@/components/tasks/TaskListView.vue'
+import TaskFormModal from '@/components/tasks/TaskFormModal.vue'
+import type { Priority, Task } from '@/types/task'
+
+const store = useTaskStore()
+
+const isModalOpen = ref(false)
+const editingTask = ref<Task | null>(null)
+const defaultLaneId = ref<string | undefined>(undefined)
+
+function openCreateModal(laneId?: string) {
+  editingTask.value = null
+  defaultLaneId.value = laneId
+  isModalOpen.value = true
+}
+
+function openEditModal(task: Task) {
+  editingTask.value = task
+  isModalOpen.value = true
+}
+
+function closeModal() {
+  isModalOpen.value = false
+  editingTask.value = null
+}
+
+function handleSubmit(payload: {
+  title: string
+  description?: string
+  priority: Priority
+  laneId: string
+}) {
+  if (editingTask.value) {
+    store.updateTask(editingTask.value.id, payload)
+  } else {
+    store.createTask(payload)
+  }
+  closeModal()
+}
+</script>
+
+<template>
+  <div class="mx-auto max-w-6xl px-8 py-8">
+    <header class="mb-6 flex flex-wrap items-start justify-between gap-4">
+      <div>
+        <h1 class="font-display text-3xl text-ink dark:text-ink-dark-text">Tasks</h1>
+        <p class="mt-1 text-sm text-ink-soft dark:text-ink-dark-text-soft">
+          {{ store.tasks.length }} task{{ store.tasks.length === 1 ? '' : 's' }} across
+          {{ store.lanes.length }} lane{{ store.lanes.length === 1 ? '' : 's' }}
+        </p>
+      </div>
+      <button
+        type="button"
+        class="rounded-standard bg-pine px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-pine-dark"
+        @click="openCreateModal()"
+      >
+        + New task
+      </button>
+    </header>
+
+    <div class="mb-6 flex flex-wrap items-center gap-4">
+      <div class="inline-flex rounded-standard border border-mist-light p-0.5 dark:border-ink-dark-border" role="group" aria-label="Task view">
+        <button
+          type="button"
+          class="rounded-[0.25rem] px-3 py-1.5 text-sm font-medium transition-colors"
+          :class="store.viewMode === 'list' ? 'bg-pine text-white' : 'text-ink-soft dark:text-ink-dark-text-soft'"
+          @click="store.setViewMode('list')"
+        >
+          List
+        </button>
+        <button
+          type="button"
+          class="rounded-[0.25rem] px-3 py-1.5 text-sm font-medium transition-colors"
+          :class="store.viewMode === 'kanban' ? 'bg-pine text-white' : 'text-ink-soft dark:text-ink-dark-text-soft'"
+          @click="store.setViewMode('kanban')"
+        >
+          Kanban
+        </button>
+      </div>
+
+      <div class="inline-flex rounded-standard border border-mist-light p-0.5 dark:border-ink-dark-border" role="group" aria-label="Sort mode">
+        <button
+          type="button"
+          class="rounded-[0.25rem] px-3 py-1.5 text-sm font-medium transition-colors"
+          :class="store.sortMode === 'custom' ? 'bg-pine text-white' : 'text-ink-soft dark:text-ink-dark-text-soft'"
+          @click="store.setSortMode('custom')"
+        >
+          Custom order
+        </button>
+        <button
+          type="button"
+          class="rounded-[0.25rem] px-3 py-1.5 text-sm font-medium transition-colors"
+          :class="store.sortMode === 'priority' ? 'bg-pine text-white' : 'text-ink-soft dark:text-ink-dark-text-soft'"
+          @click="store.setSortMode('priority')"
+        >
+          Priority sort
+        </button>
+      </div>
+
+      <p v-if="store.sortMode === 'priority'" class="text-xs text-mist dark:text-ink-dark-text-soft">
+        Drag-and-drop is off while sorting by priority.
+      </p>
+    </div>
+
+    <KanbanBoard
+      v-if="store.viewMode === 'kanban'"
+      @edit-task="openEditModal"
+      @add-task="openCreateModal"
+    />
+    <TaskListView v-else @edit-task="openEditModal" />
+
+    <TaskFormModal
+      v-if="isModalOpen"
+      :lanes="store.lanes"
+      :editing-task="editingTask"
+      :default-lane-id="defaultLaneId"
+      @close="closeModal"
+      @submit="handleSubmit"
+    />
+  </div>
+</template>
+</file>
+
+<file path="App.vue">
+<script setup lang="ts">
+import AppSidebar from '@/components/layout/AppSidebar.vue'
+</script>
+
+<template>
+  <div class="flex h-screen overflow-hidden">
+    <AppSidebar />
+    <main class="flex-1 overflow-y-auto">
+      <RouterView />
+    </main>
+  </div>
+</template>
+</file>
+
+<file path="main.ts">
+import { createApp } from 'vue'
+import { createPinia } from 'pinia'
+import router from '@/router'
+import App from '@/App.vue'
+import '@/style.css'
+
+const app = createApp(App)
+
+app.use(createPinia())
+app.use(router)
+app.mount('#app')
+</file>
+
+<file path="style.css">
+@import "tailwindcss";
+
+@theme {
+  /* Base palette */
+  --color-paper: #f3f2ed;
+  --color-paper-dim: #eae8e1;
+  --color-surface: #ffffff;
+  --color-ink: #20231f;
+  --color-ink-soft: #4a4d46;
+  --color-mist: #8a8d82;
+  --color-mist-light: #d8d6cc;
+  --color-pine: #2b5d52;
+  --color-pine-dark: #1e3f38;
+  --color-pine-light: #e4ede9;
+  --color-clay: #b5562b;
+  --color-clay-light: #f3e2d7;
+
+  /* Dark mode */
+  --color-ink-dark-bg: #14201c;
+  --color-ink-dark-surface: #1c2a25;
+  --color-ink-dark-surface-2: #223530;
+  --color-ink-dark-text: #ece9e0;
+  --color-ink-dark-text-soft: #a9ad9f;
+  --color-ink-dark-border: #2e4038;
+
+  /* Priority badges - muted earthy, tuned to the palette */
+  --color-urgent: #c6432f;
+  --color-urgent-bg: #f6e2dd;
+  --color-high: #bd7d2c;
+  --color-high-bg: #f4e7d3;
+  --color-medium: #35659e;
+  --color-medium-bg: #dfe7f0;
+  --color-low: #767a72;
+  --color-low-bg: #e6e5df;
+
+  --font-display: "Fraunces", "Georgia", serif;
+  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  --radius-standard: 0.375rem;
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+html {
+  font-family: var(--font-body);
+}
+
+body {
+  @apply bg-paper text-ink dark:bg-ink-dark-bg dark:text-ink-dark-text;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+::selection {
+  background-color: var(--color-pine-light);
+  color: var(--color-pine-dark);
+}
+
+/* Scrollbar - quiet, thin */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-mist-light) transparent;
+}
+
+.dark * {
+  scrollbar-color: var(--color-ink-dark-border) transparent;
+}
+
+/* Visible keyboard focus everywhere */
+:focus-visible {
+  outline: 2px solid var(--color-pine);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+</file>
+
+</files>

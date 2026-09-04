@@ -26,9 +26,5 @@ export const PRIORITY_ORDER: Record<Priority, number> = {
   low: 3,
 }
 
-export const PRIORITY_LABELS: Record<Priority, string> = {
-  urgent: 'Urgent',
-  high: 'High',
-  medium: 'Medium',
-  low: 'Low',
-}
+// Display labels moved to i18n (tasks.priority.*) - this map now only
+// carries the sort weight, which is domain logic, not user-facing text.

@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useTaskStore } from '@/stores/task'
 import KanbanBoard from '@/components/tasks/KanbanBoard.vue'
 import TaskListView from '@/components/tasks/TaskListView.vue'
 import TaskFormModal from '@/components/tasks/TaskFormModal.vue'
-import type { Priority, Task } from '@/types/task'
+import BaseButton from '@/components/ui/BaseButton.vue'
+import type { Task } from '@/types/task'
+import type { TaskFormPayload } from '@/composables/useTaskFormModel'
 
 const store = useTaskStore()
+const { t } = useI18n()
 
 const isModalOpen = ref(false)
 const editingTask = ref<Task | null>(null)
@@ -28,12 +32,7 @@ function closeModal() {
   editingTask.value = null
 }
 
-function handleSubmit(payload: {
-  title: string
-  description?: string
-  priority: Priority
-  laneId: string
-}) {
+function handleSubmit(payload: TaskFormPayload) {
   if (editingTask.value) {
     store.updateTask(editingTask.value.id, payload)
   } else {
@@ -47,62 +46,66 @@ function handleSubmit(payload: {
   <div class="mx-auto max-w-6xl px-8 py-8">
     <header class="mb-6 flex flex-wrap items-start justify-between gap-4">
       <div>
-        <h1 class="font-display text-3xl text-ink dark:text-ink-dark-text">Tasks</h1>
+        <h1 class="font-display text-3xl text-ink dark:text-ink-dark-text">{{ t('tasks.page.title') }}</h1>
         <p class="mt-1 text-sm text-ink-soft dark:text-ink-dark-text-soft">
-          {{ store.tasks.length }} task{{ store.tasks.length === 1 ? '' : 's' }} across
-          {{ store.lanes.length }} lane{{ store.lanes.length === 1 ? '' : 's' }}
+          {{
+            t('tasks.page.summary', {
+              count: store.tasks.length,
+              plural: store.tasks.length === 1 ? '' : 's',
+              laneCount: store.lanes.length,
+              lanePlural: store.lanes.length === 1 ? '' : 's',
+            })
+          }}
         </p>
       </div>
-      <button
-        type="button"
-        class="rounded-standard bg-pine px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-pine-dark"
-        @click="openCreateModal()"
-      >
-        + New task
-      </button>
+      <BaseButton variant="primary" @click="openCreateModal()">{{ t('tasks.page.newTask') }}</BaseButton>
     </header>
 
     <div class="mb-6 flex flex-wrap items-center gap-4">
-      <div class="inline-flex rounded-standard border border-mist-light p-0.5 dark:border-ink-dark-border" role="group" aria-label="Task view">
+      <div class="inline-flex rounded-standard border border-mist-light p-0.5 dark:border-ink-dark-border" role="group" :aria-label="t('tasks.viewToggle.label')">
         <button
           type="button"
           class="rounded-[0.25rem] px-3 py-1.5 text-sm font-medium transition-colors"
+          :aria-pressed="store.viewMode === 'list'"
           :class="store.viewMode === 'list' ? 'bg-pine text-white' : 'text-ink-soft dark:text-ink-dark-text-soft'"
           @click="store.setViewMode('list')"
         >
-          List
+          {{ t('tasks.viewToggle.list') }}
         </button>
         <button
           type="button"
           class="rounded-[0.25rem] px-3 py-1.5 text-sm font-medium transition-colors"
+          :aria-pressed="store.viewMode === 'kanban'"
           :class="store.viewMode === 'kanban' ? 'bg-pine text-white' : 'text-ink-soft dark:text-ink-dark-text-soft'"
           @click="store.setViewMode('kanban')"
         >
-          Kanban
+          {{ t('tasks.viewToggle.kanban') }}
         </button>
       </div>
 
-      <div class="inline-flex rounded-standard border border-mist-light p-0.5 dark:border-ink-dark-border" role="group" aria-label="Sort mode">
+      <div class="inline-flex rounded-standard border border-mist-light p-0.5 dark:border-ink-dark-border" role="group" :aria-label="t('tasks.sortToggle.label')">
         <button
           type="button"
           class="rounded-[0.25rem] px-3 py-1.5 text-sm font-medium transition-colors"
+          :aria-pressed="store.sortMode === 'custom'"
           :class="store.sortMode === 'custom' ? 'bg-pine text-white' : 'text-ink-soft dark:text-ink-dark-text-soft'"
           @click="store.setSortMode('custom')"
         >
-          Custom order
+          {{ t('tasks.sortToggle.custom') }}
         </button>
         <button
           type="button"
           class="rounded-[0.25rem] px-3 py-1.5 text-sm font-medium transition-colors"
+          :aria-pressed="store.sortMode === 'priority'"
           :class="store.sortMode === 'priority' ? 'bg-pine text-white' : 'text-ink-soft dark:text-ink-dark-text-soft'"
           @click="store.setSortMode('priority')"
         >
-          Priority sort
+          {{ t('tasks.sortToggle.priority') }}
         </button>
       </div>
 
       <p v-if="store.sortMode === 'priority'" class="text-xs text-mist dark:text-ink-dark-text-soft">
-        Drag-and-drop is off while sorting by priority.
+        {{ t('tasks.sortToggle.disabledHint') }}
       </p>
     </div>
 

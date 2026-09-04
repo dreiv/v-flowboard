@@ -1,16 +1,20 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import draggable from 'vuedraggable'
+import { useI18n } from 'vue-i18n'
 import { useTaskStore } from '@/stores/task'
+import { useDragAnnounce } from '@/composables/useDragAnnounce'
 import TaskCard from '@/components/tasks/TaskCard.vue'
 import type { Task } from '@/types/task'
 
 const store = useTaskStore()
+const { t } = useI18n()
+const { message: announceMessage, announce } = useDragAnnounce()
 
 const emit = defineEmits<{ editTask: [task: Task] }>()
 
 function laneName(laneId: string): string {
-  return store.lanes.find((l) => l.id === laneId)?.name ?? 'Unassigned'
+  return store.lanes.find((l) => l.id === laneId)?.name ?? t('tasks.unassignedLane')
 }
 
 // Group tasks by lane while preserving each lane's sort order, for list display.
@@ -28,6 +32,20 @@ function handleLaneReorder(laneId: string, value: Task[]) {
   )
 }
 
+function onDragEnd(laneName: string, tasks: Task[], e: { newIndex?: number }) {
+  if (e.newIndex === undefined) return
+  const task = tasks[e.newIndex]
+  if (!task) return
+  announce(
+    t('tasks.a11y.reorderAnnounce', {
+      title: task.title,
+      position: e.newIndex + 1,
+      total: tasks.length,
+      lane: laneName,
+    }),
+  )
+}
+
 function handleDelete(id: string) {
   store.deleteTask(id)
 }
@@ -39,8 +57,13 @@ function handleChangeLane(id: string, laneId: string) {
 
 <template>
   <div class="flex flex-col gap-6">
-    <div v-if="store.tasks.length === 0" class="rounded-standard border border-dashed border-mist-light p-8 text-center text-sm text-mist dark:border-ink-dark-border">
-      No tasks yet. Add your first one to get moving.
+    <p class="sr-only" role="status" aria-live="polite">{{ announceMessage }}</p>
+
+    <div
+      v-if="store.tasks.length === 0"
+      class="rounded-standard border border-dashed border-mist-light p-8 text-center text-sm text-mist dark:border-ink-dark-border"
+    >
+      {{ t('tasks.emptyState') }}
     </div>
 
     <section v-for="group in groups" :key="group.lane.id">
@@ -55,18 +78,23 @@ function handleChangeLane(id: string, laneId: string) {
         handle=".drag-handle"
         ghost-class="opacity-40"
         class="flex flex-col gap-2"
+        role="list"
+        :aria-label="laneName(group.lane.id)"
         @update:model-value="(v: Task[]) => handleLaneReorder(group.lane.id, v)"
+        @end="(e: { newIndex?: number }) => onDragEnd(laneName(group.lane.id), group.tasks, e)"
       >
         <template #item="{ element }">
-          <TaskCard
-            :task="element"
-            :lanes="store.lanes"
-            :draggable="store.sortMode === 'custom'"
-            variant="list"
-            @edit="emit('editTask', $event)"
-            @delete="handleDelete"
-            @change-lane="handleChangeLane"
-          />
+          <div role="listitem">
+            <TaskCard
+              :task="element"
+              :lanes="store.lanes"
+              :draggable="store.sortMode === 'custom'"
+              variant="list"
+              @edit="emit('editTask', $event)"
+              @delete="handleDelete"
+              @change-lane="handleChangeLane"
+            />
+          </div>
         </template>
       </draggable>
     </section>

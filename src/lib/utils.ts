@@ -18,7 +18,12 @@ export function todayKey(): string {
   return toDateKey(new Date())
 }
 
-/** Human-friendly label for a YYYY-MM-DD date key, e.g. "Thursday, 4 September". */
+/**
+ * Human-friendly label for a YYYY-MM-DD date key, e.g. "Thursday, 4 September".
+ * Uses the browser's locale (`undefined` -> navigator locale) so formatting
+ * follows the user's OS/browser language rather than a hardcoded one -
+ * i18n-ready by construction, no JS string concatenation.
+ */
 export function formatDateLabel(dateKey: string): string {
   const [y, m, d] = dateKey.split('-').map(Number)
   const date = new Date(y, m - 1, d)

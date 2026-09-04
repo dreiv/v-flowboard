@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { i18n } from '@/i18n'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -8,14 +9,25 @@ const router = createRouter({
       path: '/tasks',
       name: 'tasks',
       component: () => import('@/views/TasksView.vue'),
+      meta: { titleKey: 'routeTitles.tasks' },
     },
     {
       path: '/journal',
       name: 'journal',
       component: () => import('@/views/JournalView.vue'),
+      meta: { titleKey: 'routeTitles.journal' },
     },
     { path: '/:pathMatch(.*)*', redirect: '/tasks' },
   ],
+})
+
+// Keep the document title in sync with the active route, translated via the
+// same i18n instance the rest of the app uses (routeTitles.* in locales).
+router.afterEach((to) => {
+  const titleKey = to.meta.titleKey as string | undefined
+  if (titleKey) {
+    document.title = i18n.global.t(titleKey)
+  }
 })
 
 export default router

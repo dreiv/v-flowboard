@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import type { Lane, Task } from '@/types/task'
 import PriorityBadge from '@/components/tasks/PriorityBadge.vue'
+import BaseSelect from '@/components/ui/BaseSelect.vue'
+import BaseButton from '@/components/ui/BaseButton.vue'
 
 const props = defineProps<{
   task: Task
@@ -14,17 +17,21 @@ const emit = defineEmits<{
   delete: [id: string]
   changeLane: [id: string, laneId: string]
 }>()
+
+const { t } = useI18n()
 </script>
 
 <template>
-  <div
+  <article
     class="group flex gap-2 rounded-standard border border-mist-light bg-surface p-3 transition-shadow dark:border-ink-dark-border dark:bg-ink-dark-surface"
     :class="variant === 'list' ? 'items-start' : 'flex-col'"
+    :aria-label="task.title"
   >
     <span
       v-if="draggable"
       class="drag-handle mt-0.5 shrink-0 cursor-grab select-none text-mist-light dark:text-ink-dark-border"
-      aria-hidden="true"
+      :aria-label="t('tasks.card.dragHandle', { title: task.title })"
+      tabindex="0"
     >
       ⠿
     </span>
@@ -42,29 +49,20 @@ const emit = defineEmits<{
       </p>
 
       <div class="mt-2 flex items-center gap-3 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
-        <button
-          type="button"
-          class="text-xs font-medium text-pine hover:underline dark:text-pine-light"
-          @click="emit('edit', task)"
-        >
-          Edit
-        </button>
-        <select
-          class="rounded-standard border border-mist-light bg-paper px-1.5 py-0.5 text-xs text-ink-soft dark:border-ink-dark-border dark:bg-ink-dark-surface-2 dark:text-ink-dark-text-soft"
-          :value="task.laneId"
-          aria-label="Change lane"
-          @change="emit('changeLane', task.id, ($event.target as HTMLSelectElement).value)"
-        >
-          <option v-for="lane in lanes" :key="lane.id" :value="lane.id">{{ lane.name }}</option>
-        </select>
-        <button
-          type="button"
-          class="text-xs font-medium text-mist hover:text-urgent"
-          @click="emit('delete', task.id)"
-        >
-          Delete
-        </button>
+        <BaseButton variant="ghost" size="sm" class="!px-0 text-pine hover:underline dark:text-pine-light" @click="emit('edit', task)">
+          {{ t('tasks.card.edit') }}
+        </BaseButton>
+        <BaseSelect
+          class="!w-auto"
+          :model-value="task.laneId"
+          :aria-label="t('tasks.card.changeLane')"
+          :options="lanes.map((l) => ({ value: l.id, label: l.name }))"
+          @update:model-value="(laneId) => emit('changeLane', task.id, laneId)"
+        />
+        <BaseButton variant="ghost" size="sm" class="!px-0 text-mist hover:text-urgent" @click="emit('delete', task.id)">
+          {{ t('tasks.card.delete') }}
+        </BaseButton>
       </div>
     </div>
-  </div>
+  </article>
 </template>

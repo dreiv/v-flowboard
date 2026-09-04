@@ -122,7 +122,7 @@ export const useTaskStore = defineStore('task', () => {
   function deleteLane(id: string): boolean {
     const hasTasks = tasks.value.some((t) => t.laneId === id)
     if (hasTasks) {
-      laneDeleteError.value = 'Move or delete every task in this lane before removing it.'
+      laneDeleteError.value = 'lane-has-tasks'
       return false
     }
     lanes.value = lanes.value.filter((l) => l.id !== id)

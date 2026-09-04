@@ -1,0 +1,101 @@
+{
+  "common": {
+    "buttons": {
+      "cancel": "Cancel",
+      "close": "Close",
+      "add": "Add",
+      "dismiss": "Dismiss"
+    }
+  },
+  "nav": {
+    "brand": "Flowboard",
+    "tagline": "Tasks & daily notes",
+    "primary": "Primary",
+    "tasks": "Tasks",
+    "journal": "Journal"
+  },
+  "darkMode": {
+    "toggleLabel": "Toggle color theme",
+    "dark": "Dark mode",
+    "light": "Light mode"
+  },
+  "journal": {
+    "sidebar": {
+      "previousDay": "Previous day",
+      "today": "Today",
+      "nextDay": "Next day",
+      "jumpToDate": "Jump to date",
+      "entriesHeading": "Entries",
+      "entriesNav": "Journal entries by date",
+      "noEntries": "No entries yet."
+    },
+    "editor": {
+      "placeholder": "Write about your day...",
+      "savedToDevice": "Saved to this device",
+      "saving": "Saving…"
+    }
+  },
+  "tasks": {
+    "page": {
+      "title": "Tasks",
+      "summary": "{count} task{plural} across {laneCount} lane{lanePlural}",
+      "newTask": "+ New task"
+    },
+    "viewToggle": {
+      "label": "Task view",
+      "list": "List",
+      "kanban": "Kanban"
+    },
+    "sortToggle": {
+      "label": "Sort mode",
+      "custom": "Custom order",
+      "priority": "Priority sort",
+      "disabledHint": "Drag-and-drop is off while sorting by priority."
+    },
+    "emptyState": "No tasks yet. Add your first one to get moving.",
+    "unassignedLane": "Unassigned",
+    "board": {
+      "newLanePlaceholder": "Lane name",
+      "addLane": "+ New lane",
+      "addTaskToLane": "+ Add task",
+      "deleteLane": "Delete lane",
+      "deleteLaneNamed": "Delete lane: {name}"
+    },
+    "card": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "changeLane": "Change lane",
+      "dragHandle": "Drag to reorder {title}"
+    },
+    "form": {
+      "titleNew": "New task",
+      "titleEdit": "Edit task",
+      "titleLabel": "Title",
+      "titlePlaceholder": "What needs doing?",
+      "descriptionLabel": "Description",
+      "descriptionOptional": "(optional)",
+      "descriptionPlaceholder": "Add more detail...",
+      "priorityLabel": "Priority",
+      "laneLabel": "Lane",
+      "submitNew": "Add task",
+      "submitEdit": "Save changes"
+    },
+    "priority": {
+      "urgent": "Urgent",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "errors": {
+      "laneHasTasks": "Move or delete every task in this lane before removing it."
+    },
+    "a11y": {
+      "reorderAnnounce": "{title} moved to position {position} of {total} in {lane}",
+      "laneChangeAnnounce": "{title} moved to {lane}"
+    }
+  },
+  "routeTitles": {
+    "tasks": "Tasks · Flowboard",
+    "journal": "Journal · Flowboard"
+  }
+}

@@ -1,10 +1,16 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useTaskStore } from '@/stores/task'
+import { useDragAnnounce } from '@/composables/useDragAnnounce'
 import LaneColumn from '@/components/tasks/LaneColumn.vue'
+import BaseInput from '@/components/ui/BaseInput.vue'
+import BaseButton from '@/components/ui/BaseButton.vue'
 import type { Task } from '@/types/task'
 
 const store = useTaskStore()
+const { t } = useI18n()
+const { message: announceMessage, announce } = useDragAnnounce()
 
 const emit = defineEmits<{
   editTask: [task: Task]
@@ -27,7 +33,12 @@ function handleDelete(id: string) {
 }
 
 function handleChangeLane(id: string, laneId: string) {
+  const lane = store.lanes.find((l) => l.id === laneId)
+  const task = store.tasks.find((tk) => tk.id === id)
   store.moveTaskToLane(id, laneId)
+  if (lane && task) {
+    announce(t('tasks.a11y.laneChangeAnnounce', { title: task.title, lane: lane.name }))
+  }
 }
 
 function handleReorder(laneId: string, orderedIds: string[]) {
@@ -45,14 +56,18 @@ function handleRemoveLane(id: string) {
 
 <template>
   <div>
+    <!-- Live region for screen-reader announcements of drag-and-drop outcomes -->
+    <p class="sr-only" role="status" aria-live="polite">{{ announceMessage }}</p>
+
     <p
       v-if="store.laneDeleteError"
       class="mb-3 rounded-standard border border-urgent/30 bg-urgent-bg px-3 py-2 text-sm text-urgent"
+      role="alert"
     >
-      {{ store.laneDeleteError }}
-      <button type="button" class="ml-2 underline" @click="store.clearLaneDeleteError()">
-        Dismiss
-      </button>
+      {{ t('tasks.errors.laneHasTasks') }}
+      <BaseButton variant="ghost" size="sm" class="ml-2 !px-0 underline" @click="store.clearLaneDeleteError()">
+        {{ t('common.buttons.dismiss') }}
+      </BaseButton>
     </p>
 
     <div class="flex gap-4 overflow-x-auto pb-4">
@@ -70,44 +85,31 @@ function handleRemoveLane(id: string) {
         @rename="handleRename"
         @remove="handleRemoveLane"
         @add-task="emit('addTask', $event)"
+        @announce="announce"
       />
 
       <div class="w-56 shrink-0">
         <div v-if="isAddingLane" class="flex flex-col gap-2">
-          <input
+          <BaseInput
             v-model="newLaneName"
-            type="text"
             autofocus
-            placeholder="Lane name"
-            class="rounded-standard border border-mist-light bg-paper px-2 py-1.5 text-sm outline-none focus:border-pine dark:border-ink-dark-border dark:bg-ink-dark-surface-2 dark:text-ink-dark-text"
+            :placeholder="t('tasks.board.newLanePlaceholder')"
             @keydown.enter="submitNewLane"
             @keydown.esc="isAddingLane = false"
           />
           <div class="flex gap-2">
-            <button
-              type="button"
-              class="rounded-standard bg-pine px-3 py-1 text-xs font-medium text-white hover:bg-pine-dark"
-              @click="submitNewLane"
-            >
-              Add
-            </button>
-            <button
-              type="button"
-              class="rounded-standard px-3 py-1 text-xs text-mist hover:bg-paper-dim"
-              @click="isAddingLane = false"
-            >
-              Cancel
-            </button>
+            <BaseButton variant="primary" size="sm" @click="submitNewLane">{{ t('common.buttons.add') }}</BaseButton>
+            <BaseButton variant="ghost" size="sm" @click="isAddingLane = false">{{ t('common.buttons.cancel') }}</BaseButton>
           </div>
         </div>
-        <button
+        <BaseButton
           v-else
-          type="button"
-          class="flex h-10 w-full items-center justify-center rounded-standard border border-dashed border-mist-light text-sm text-mist transition-colors hover:border-pine hover:text-pine dark:border-ink-dark-border"
+          variant="secondary"
+          class="!h-10 !w-full border-dashed"
           @click="isAddingLane = true"
         >
-          + New lane
-        </button>
+          {{ t('tasks.board.addLane') }}
+        </BaseButton>
       </div>
     </div>
   </div>

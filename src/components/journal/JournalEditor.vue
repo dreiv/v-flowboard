@@ -1,30 +1,10 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import { useDebounceFn } from '@vueuse/core'
-import { useJournalStore } from '@/stores/journal'
+import { useI18n } from 'vue-i18n'
+import { useJournalDraft } from '@/composables/useJournalDraft'
 import { formatDateLabel } from '@/lib/utils'
 
-const store = useJournalStore()
-
-const draft = ref('')
-const saveState = ref<'saved' | 'pending'>('saved')
-
-function loadDraftFor(date: string) {
-  draft.value = store.entryForDate(date)?.content ?? ''
-  saveState.value = 'saved'
-}
-
-watch(() => store.selectedDate, loadDraftFor, { immediate: true })
-
-const debouncedSave = useDebounceFn((date: string, content: string) => {
-  store.saveEntry(date, content)
-  saveState.value = 'saved'
-}, 600)
-
-function handleInput() {
-  saveState.value = 'pending'
-  debouncedSave(store.selectedDate, draft.value)
-}
+const { store, draft, saveState, handleInput } = useJournalDraft()
+const { t } = useI18n()
 </script>
 
 <template>
@@ -33,14 +13,14 @@ function handleInput() {
       <h2 class="font-display text-2xl text-ink dark:text-ink-dark-text">
         {{ formatDateLabel(store.selectedDate) }}
       </h2>
-      <span class="text-xs text-mist dark:text-ink-dark-text-soft">
-        {{ saveState === 'saved' ? 'Saved to this device' : 'Saving…' }}
+      <span class="text-xs text-mist dark:text-ink-dark-text-soft" role="status">
+        {{ saveState === 'saved' ? t('journal.editor.savedToDevice') : t('journal.editor.saving') }}
       </span>
     </div>
 
     <textarea
       v-model="draft"
-      placeholder="Write about your day..."
+      :placeholder="t('journal.editor.placeholder')"
       class="min-h-[60vh] flex-1 resize-none rounded-standard border border-mist-light bg-surface p-4 text-[0.95rem] leading-relaxed text-ink outline-none focus:border-pine dark:border-ink-dark-border dark:bg-ink-dark-surface dark:text-ink-dark-text"
       @input="handleInput"
     />
