@@ -1,54 +1,48 @@
-# .
+# Flowboard
 
-This template should help get you started developing with Vue 3 in Vite.
+A single-page productivity app with a Tasks/Kanban board and a Daily Journal, built with Vue 3 (Composition API + `<script setup>`), TypeScript, Pinia, Vue Router, Tailwind CSS v4, VueUse, and vuedraggable. All data is persisted to the browser's LocalStorage — no backend required.
 
-## Recommended IDE Setup
+## Getting started
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
-
-## Recommended Browser Setup
-
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
-
-## Type Support for `.vue` Imports in TS
-
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
+```bash
 npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
 npm run dev
 ```
 
-### Type-Check, Compile and Minify for Production
+Then open the printed local URL (usually http://localhost:5173).
 
-```sh
-npm run build
+## Other scripts
+
+```bash
+npm run build     # type-check + production build to dist/
+npm run preview   # preview the production build locally
 ```
 
-### Run Unit Tests with [Vitest](https://vitest.dev/)
+## Features
 
-```sh
-npm run test:unit
+- **Tasks** (`/tasks`)
+  - List view and Kanban view, toggled from the header
+  - Custom drag-and-drop ordering, or automatic Priority sort (urgent → high → medium → low); dragging is disabled while priority-sorted
+  - Full CRUD for tasks (title, description, priority, lane) via a modal
+  - Full CRUD for lanes, including inline rename; a lane can't be deleted while it still has tasks in it
+- **Journal** (`/journal`)
+  - Left date rail: jump to today, step a day at a time, pick any date, browse past entries
+  - Right editor panel with debounced auto-save and a save-state indicator
+- **Shell**
+  - Dark/light mode toggle (persisted)
+  - Everything synced automatically to LocalStorage — refresh-safe
+
+## Project structure
+
 ```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
+src/
+  components/
+    tasks/       TaskCard, PriorityBadge, LaneColumn, KanbanBoard, TaskListView, TaskFormModal
+    journal/      DateRail, JournalEditor
+    layout/       AppSidebar, ModalDialog
+  stores/         task.ts, journal.ts  (Pinia, backed by @vueuse/core's useStorage)
+  views/          TasksView.vue, JournalView.vue
+  router/         index.ts
+  types/          task.ts, journal.ts
+  lib/            utils.ts
 ```
