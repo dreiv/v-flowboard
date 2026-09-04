@@ -26,8 +26,8 @@ const { t } = useI18n()
     </span>
     <span class="relative h-4 w-8 shrink-0 rounded-full transition-colors"
       :class="[isDark ? 'bg-pine' : 'bg-white/20', collapsed ? '' : 'ml-2']" aria-hidden="true">
-      <span class="absolute top-0.5 h-3 w-3 rounded-full bg-white transition-transform"
-        :class="isDark ? 'translate-x-4' : 'translate-x-0.5'" />
+      <span class="absolute left-0 top-0.5 h-3 w-3 rounded-full bg-white transition-transform"
+        :class="isDark ? 'translate-x-4.5' : 'translate-x-0.5'" />
     </span>
   </button>
 </template>
