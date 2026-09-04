@@ -1,7 +1,5 @@
 <script setup lang="ts">
-// Generic text/date input primitive with v-model support. Deliberately has
-// no knowledge of "tasks" or "journal entries" (Liskov/Interface
-// Segregation) - domain components pass label text and bind v-model.
+// Domain-agnostic text/date input; callers supply label text and bind v-model.
 withDefaults(
   defineProps<{
     modelValue: string
@@ -18,14 +16,8 @@ defineEmits<{ 'update:modelValue': [string] }>()
 </script>
 
 <template>
-  <input
-    :id="id"
-    :type="type"
-    :value="modelValue"
-    :placeholder="placeholder"
-    :required="required"
+  <input :id="id" :type="type" :value="modelValue" :placeholder="placeholder" :required="required"
     :autofocus="autofocus"
     class="w-full rounded-standard border border-mist-light bg-paper px-3 py-2 text-sm text-ink outline-none focus:border-pine dark:border-ink-dark-border dark:bg-ink-dark-surface-2 dark:text-ink-dark-text"
-    @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
-  />
+    @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)" />
 </template>

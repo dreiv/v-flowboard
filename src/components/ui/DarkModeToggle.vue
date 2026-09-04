@@ -2,10 +2,7 @@
 import { useDark, useToggle } from '@vueuse/core'
 import { useI18n } from 'vue-i18n'
 
-// Single source of truth for dark mode: syncs with system preference by
-// default, persists manual overrides to localStorage under
-// 'vueuse-color-scheme', and targets <html class="dark">. index.html applies
-// the same stored value before Vue mounts to avoid a first-paint flash.
+// Dark-mode source of truth; index.html reads the same 'vueuse-color-scheme' key pre-mount to avoid a first-paint flash.
 const isDark = useDark({
   selector: 'html',
   attribute: 'class',

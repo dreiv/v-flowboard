@@ -1,7 +1,5 @@
 <script setup lang="ts">
-// Generic button primitive. Open for extension via slot content and the
-// `variant`/`size` prop contract, closed for modification (O in SOLID) -
-// callers never need to edit this file to get a new look.
+// Domain-agnostic button primitive; new looks come from variant/size, not edits here.
 withDefaults(
   defineProps<{
     variant?: 'primary' | 'secondary' | 'ghost' | 'danger-ghost'
@@ -33,12 +31,8 @@ const sizes: Record<string, string> = {
 </script>
 
 <template>
-  <button
-    :type="type"
-    :disabled="disabled"
-    :class="[base, variants[variant], sizes[size]]"
-    @click="(e) => $emit('click', e)"
-  >
+  <button :type="type" :disabled="disabled" :class="[base, variants[variant], sizes[size]]"
+    @click="(e) => $emit('click', e)">
     <slot />
   </button>
 </template>

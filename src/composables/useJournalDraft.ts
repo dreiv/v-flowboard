@@ -2,12 +2,7 @@ import { ref, watch } from 'vue'
 import { useDebounceFn } from '@vueuse/core'
 import { useJournalStore } from '@/stores/journal'
 
-/**
- * Owns the debounced-autosave draft lifecycle for the journal editor.
- * Extracted out of JournalEditor.vue (Dependency Inversion) so the
- * component only wires refs to the template; the persistence/debounce
- * logic is independently testable and reusable.
- */
+/** Debounced-autosave draft lifecycle for the journal editor. */
 export function useJournalDraft() {
   const store = useJournalStore()
 

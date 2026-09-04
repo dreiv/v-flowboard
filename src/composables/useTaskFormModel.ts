@@ -8,20 +8,16 @@ export interface TaskFormPayload {
   laneId: string
 }
 
-/**
- * Owns the reactive form state and submit-payload shaping for the task
- * create/edit form. Extracted out of TaskFormModal.vue (Dependency
- * Inversion) so the modal component stays a thin view over this state.
- */
+/** Reactive form state + submit-payload shaping for the task create/edit form. */
 export function useTaskFormModel(
   editingTask: Ref<Task | null | undefined>,
   defaultLaneId: Ref<string | undefined>,
   lanes: Ref<Lane[]>,
 ) {
-  const form = reactive<TaskFormPayload>({
+  const form = reactive({
     title: '',
     description: '',
-    priority: 'medium',
+    priority: 'medium' as Priority,
     laneId: defaultLaneId.value ?? lanes.value[0]?.id ?? '',
   })
 

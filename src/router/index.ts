@@ -21,8 +21,6 @@ const router = createRouter({
   ],
 })
 
-// Keep the document title in sync with the active route, translated via the
-// same i18n instance the rest of the app uses (routeTitles.* in locales).
 router.afterEach((to) => {
   const titleKey = to.meta.titleKey as string | undefined
   if (titleKey) {

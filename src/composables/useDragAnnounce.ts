@@ -1,12 +1,6 @@
 import { ref } from 'vue'
 
-/**
- * Holds a single polite live-region message for announcing drag-and-drop
- * outcomes to screen reader users, since vuedraggable's mouse/touch
- * reordering has no built-in SR announcement. One shared composable instance
- * per board keeps the announcement text and the aria-live region in sync
- * without prop-drilling through every lane/card.
- */
+/** Polite live-region message for drag-and-drop outcomes (vuedraggable has no built-in SR announcement). */
 export function useDragAnnounce() {
   const message = ref('')
 

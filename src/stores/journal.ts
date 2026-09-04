@@ -18,12 +18,10 @@ export const useJournalStore = defineStore('journal', () => {
     selectedDate.value = date
   }
 
-  /** Fetches the entry for a date, or an empty draft if none exists yet. */
   function entryForDate(date: string): JournalEntry | undefined {
     return entries.value.find((e) => e.date === date)
   }
 
-  /** Creates or updates the entry for a date with new content. */
   function saveEntry(date: string, content: string): void {
     const existing = entries.value.find((e) => e.date === date)
     if (existing) {

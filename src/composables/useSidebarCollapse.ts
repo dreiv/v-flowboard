@@ -1,11 +1,6 @@
 import { useStorage } from '@vueuse/core'
 
-/**
- * Persisted collapsed/expanded state for the primary navigation sidebar.
- * Extracted as a composable so any component (sidebar, a future settings
- * panel, keyboard shortcut handler, ...) can read/toggle it without
- * reaching into AppSidebar's internals.
- */
+/** Persisted collapsed/expanded state for the primary nav sidebar. */
 export function useSidebarCollapse() {
   const isCollapsed = useStorage('flowboard.sidebarCollapsed', false)
 

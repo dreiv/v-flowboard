@@ -24,7 +24,6 @@ export const useTaskStore = defineStore('task', () => {
 
   // ---- Derived data -------------------------------------------------
 
-  /** Tasks for a given lane, ordered according to the active sort mode. */
   function tasksForLane(laneId: string): Task[] {
     const inLane = tasks.value.filter((t) => t.laneId === laneId)
     if (sortMode.value === 'priority') {

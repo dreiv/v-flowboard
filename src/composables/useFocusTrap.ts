@@ -1,11 +1,6 @@
 import { onMounted, onUnmounted, type Ref } from 'vue'
 
-/**
- * Traps Tab/Shift+Tab focus cycling within `containerRef` while active, and
- * moves initial focus into it. Extracted as a composable (Dependency
- * Inversion) so any dialog/overlay can opt in without re-implementing the
- * keyboard logic.
- */
+/** Traps Tab/Shift+Tab within `containerRef` and moves initial focus into it. */
 export function useFocusTrap(containerRef: Ref<HTMLElement | null>) {
   function focusableEls(): HTMLElement[] {
     const container = containerRef.value
@@ -35,8 +30,12 @@ export function useFocusTrap(containerRef: Ref<HTMLElement | null>) {
 
   onMounted(() => {
     document.addEventListener('keydown', onKeydown)
-    // Move focus into the trap on mount so keyboard users land inside it.
-    requestAnimationFrame(() => focusableEls()[0]?.focus())
+    // Land keyboard users inside the trap; prefer an explicit [autofocus] target.
+    requestAnimationFrame(() => {
+      const container = containerRef.value
+      const preferred = container?.querySelector<HTMLElement>('[autofocus]')
+      ;(preferred ?? focusableEls()[0])?.focus()
+    })
   })
 
   onUnmounted(() => document.removeEventListener('keydown', onKeydown))
