@@ -12,7 +12,9 @@
     "tagline": "Tasks & daily notes",
     "primary": "Primary",
     "tasks": "Tasks",
-    "journal": "Journal"
+    "journal": "Journal",
+    "collapse": "Collapse sidebar",
+    "expand": "Expand sidebar"
   },
   "darkMode": {
     "toggleLabel": "Toggle color theme",
