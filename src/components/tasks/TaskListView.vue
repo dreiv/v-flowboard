@@ -60,12 +60,12 @@ function handleChangeLane(id: string, laneId: string) {
     <p class="sr-only" role="status" aria-live="polite">{{ announceMessage }}</p>
 
     <div v-if="store.tasks.length === 0"
-      class="rounded-standard border border-dashed border-mist-light p-8 text-center text-sm text-mist dark:border-ink-dark-border">
+      class="rounded-standard border border-dashed border-mist-light p-8 text-center text-sm text-mist">
       {{ t('tasks.emptyState') }}
     </div>
 
     <section v-for="group in groups" :key="group.lane.id">
-      <h3 class="mb-2 text-xs font-medium uppercase tracking-wide text-mist dark:text-ink-dark-text-soft">
+      <h3 class="mb-2 text-xs font-medium uppercase tracking-wide text-mist">
         {{ laneName(group.lane.id) }} · {{ group.tasks.length }}
       </h3>
       <draggable :model-value="group.tasks" :group="{ name: 'tasks' }" item-key="id"

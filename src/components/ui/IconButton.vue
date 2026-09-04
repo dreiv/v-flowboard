@@ -14,7 +14,7 @@ defineEmits<{ click: [MouseEvent] }>()
 
 <template>
   <button :type="type" :disabled="disabled" :aria-label="ariaLabel"
-    class="rounded-standard px-2 py-1 text-sm text-ink-soft transition-colors hover:bg-paper-dim disabled:cursor-not-allowed disabled:opacity-50 dark:text-ink-dark-text-soft dark:hover:bg-ink-dark-surface-2"
+    class="rounded-standard px-2 py-1 text-sm text-ink-soft transition-colors hover:bg-paper-dim disabled:cursor-not-allowed disabled:opacity-50"
     @click="(e) => $emit('click', e)">
     <slot />
   </button>

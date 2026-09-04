@@ -15,20 +15,12 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
 <template>
   <Teleport to="body">
     <div class="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 p-4" @click.self="emit('close')">
-      <div
-        class="w-full max-w-md rounded-standard border border-mist-light bg-surface p-5 shadow-xl dark:border-ink-dark-border dark:bg-ink-dark-surface"
-        role="dialog"
-        aria-modal="true"
-        :aria-label="props.title"
-      >
+      <div class="w-full max-w-md rounded-standard border border-mist-light bg-surface p-5 shadow-xl" role="dialog"
+        aria-modal="true" :aria-label="props.title">
         <div class="mb-4 flex items-center justify-between">
-          <h2 class="font-display text-lg text-ink dark:text-ink-dark-text">{{ props.title }}</h2>
-          <button
-            type="button"
-            class="rounded-standard px-2 py-1 text-mist hover:bg-paper-dim hover:text-ink dark:hover:bg-ink-dark-surface-2 dark:hover:text-ink-dark-text"
-            aria-label="Close"
-            @click="emit('close')"
-          >
+          <h2 class="font-display text-lg text-ink">{{ props.title }}</h2>
+          <button type="button" class="rounded-standard px-2 py-1 text-mist hover:bg-paper-dim hover:text-ink"
+            aria-label="Close" @click="emit('close')">
             ✕
           </button>
         </div>

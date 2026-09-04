@@ -22,28 +22,25 @@ const { t } = useI18n()
 </script>
 
 <template>
-  <article
-    class="group flex gap-2 rounded-standard border border-mist-light bg-surface p-3 transition-shadow dark:border-ink-dark-border dark:bg-ink-dark-surface"
+  <article class="group flex gap-2 rounded-standard border border-mist-light bg-surface p-3 transition-shadow"
     :class="variant === 'list' ? 'items-start' : 'flex-col'" :aria-label="task.title">
-    <span v-if="draggable"
-      class="drag-handle mt-0.5 shrink-0 cursor-grab select-none text-mist-light dark:text-ink-dark-border"
+    <span v-if="draggable" class="drag-handle mt-0.5 shrink-0 cursor-grab select-none text-mist-light"
       aria-hidden="true">
       ⠿
     </span>
 
     <div class="min-w-0 flex-1">
       <div class="flex items-start justify-between gap-2">
-        <p class="text-sm font-medium text-ink dark:text-ink-dark-text">{{ task.title }}</p>
+        <p class="text-sm font-medium text-ink">{{ task.title }}</p>
         <PriorityBadge :priority="task.priority" size="sm" />
       </div>
-      <p v-if="task.description" class="mt-1 line-clamp-2 text-xs text-ink-soft dark:text-ink-dark-text-soft">
+      <p v-if="task.description" class="mt-1 line-clamp-2 text-xs text-ink-soft">
         {{ task.description }}
       </p>
 
       <div
         class="mt-2 flex items-center gap-3 transition-opacity md:opacity-0 md:group-hover:opacity-100 md:focus-within:opacity-100">
-        <BaseButton variant="ghost" size="sm" class="px-0! text-pine hover:underline dark:text-pine-light"
-          @click="emit('edit', task)">
+        <BaseButton variant="ghost" size="sm" class="px-0! text-link hover:underline" @click="emit('edit', task)">
           {{ t('tasks.card.edit') }}
         </BaseButton>
         <BaseSelect class="w-auto!" :model-value="task.laneId" :aria-label="t('tasks.card.changeLane')"

@@ -3,11 +3,12 @@ import { useDark, useToggle } from '@vueuse/core'
 import { useI18n } from 'vue-i18n'
 
 // Dark-mode source of truth; index.html reads the same 'vueuse-color-scheme' key pre-mount to avoid a first-paint flash.
+// Drives `data-theme` on <html> so `color-scheme` (and thus `light-dark()`) resolves correctly.
 const isDark = useDark({
   selector: 'html',
-  attribute: 'class',
+  attribute: 'data-theme',
   valueDark: 'dark',
-  valueLight: '',
+  valueLight: 'light',
 })
 const toggleDark = useToggle(isDark)
 

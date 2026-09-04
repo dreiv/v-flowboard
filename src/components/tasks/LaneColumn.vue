@@ -82,20 +82,18 @@ function cancelRename() {
 </script>
 
 <template>
-  <section class="flex w-72 shrink-0 flex-col border-l-2 border-pine/60 pl-3 dark:border-pine/40"
-    :aria-label="lane.name">
+  <section class="flex w-72 shrink-0 flex-col border-l-2 border-pine/60 pl-3" :aria-label="lane.name">
     <div class="mb-3 flex items-center justify-between gap-2">
       <div class="min-w-0 flex-1">
         <BaseInput v-if="isRenaming" v-model="renameValue" autofocus class="py-0.5! text-sm! font-medium"
           @keydown.enter="commitRename" @keydown.esc="cancelRename" @blur="commitRename" />
-        <button v-else type="button"
-          class="truncate text-sm font-medium text-ink hover:underline dark:text-ink-dark-text"
+        <button v-else type="button" class="truncate text-sm font-medium text-ink hover:underline"
           :disabled="lane.isDefault" :class="lane.isDefault ? 'cursor-default hover:no-underline' : ''"
           @click="!lane.isDefault && startRename()">
           {{ lane.name }}
         </button>
       </div>
-      <span class="shrink-0 text-xs text-mist dark:text-ink-dark-text-soft">{{ tasks.length }}</span>
+      <span class="shrink-0 text-xs text-mist">{{ tasks.length }}</span>
       <IconButton v-if="!lane.isDefault" class="px-0! shrink-0 text-xs hover:text-urgent"
         :ariaLabel="t('tasks.board.deleteLaneNamed', { name: lane.name })" @click="emit('remove', lane.id)">
         ✕
@@ -113,7 +111,7 @@ function cancelRename() {
       </template>
     </draggable>
 
-    <BaseButton variant="secondary" class="mt-2 w-full! border-dashed py-2! text-xs hover:border-pine hover:text-pine"
+    <BaseButton variant="secondary" class="mt-2 w-full! border-dashed py-2! text-xs hover:border-pine hover:text-link"
       @click="emit('addTask', lane.id)">
       {{ t('tasks.board.addTaskToLane') }}
     </BaseButton>

@@ -59,7 +59,8 @@ function handleRemoveLane(id: string) {
     <p class="sr-only" role="status" aria-live="polite">{{ announceMessage }}</p>
 
     <p v-if="store.laneDeleteError"
-      class="mb-3 rounded-standard border border-urgent/30 bg-urgent-bg px-3 py-2 text-sm text-urgent" role="alert">
+      class="mb-3 rounded-standard border border-urgent/30 bg-urgent-bg px-3 py-2 text-sm text-urgent-text"
+      role="alert">
       {{ t('tasks.errors.laneHasTasks') }}
       <BaseButton variant="ghost" size="sm" class="ml-2 px-0! underline" @click="store.clearLaneDeleteError()">
         {{ t('common.buttons.dismiss') }}

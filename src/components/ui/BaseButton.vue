@@ -18,9 +18,9 @@ const base =
 const variants: Record<string, string> = {
   primary: 'bg-pine text-white hover:bg-pine-dark',
   secondary:
-    'border border-mist-light text-ink-soft hover:bg-paper-dim dark:border-ink-dark-border dark:text-ink-dark-text-soft dark:hover:bg-ink-dark-surface-2',
+    'border border-mist-light text-ink-soft hover:bg-paper-dim',
   ghost:
-    'text-ink-soft hover:bg-paper-dim dark:text-ink-dark-text-soft dark:hover:bg-ink-dark-surface-2',
+    'text-ink-soft hover:bg-paper-dim',
   'danger-ghost': 'text-mist hover:text-urgent',
 }
 

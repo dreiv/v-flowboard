@@ -44,47 +44,36 @@ function handleSubmit() {
   <ModalDialog :title="editingTask ? t('tasks.form.titleEdit') : t('tasks.form.titleNew')" @close="emit('close')">
     <form class="flex flex-col gap-4" @submit.prevent="handleSubmit">
       <div>
-        <label for="task-title" class="mb-1 block text-xs font-medium text-ink-soft dark:text-ink-dark-text-soft">
+        <label for="task-title" class="mb-1 block text-xs font-medium text-ink-soft">
           {{ t('tasks.form.titleLabel') }}
         </label>
-        <BaseInput
-          id="task-title"
-          v-model="form.title"
-          required
-          autofocus
-          :placeholder="t('tasks.form.titlePlaceholder')"
-        />
+        <BaseInput id="task-title" v-model="form.title" required autofocus
+          :placeholder="t('tasks.form.titlePlaceholder')" />
       </div>
 
       <div>
-        <label for="task-desc" class="mb-1 block text-xs font-medium text-ink-soft dark:text-ink-dark-text-soft">
-          {{ t('tasks.form.descriptionLabel') }} <span class="text-mist">{{ t('tasks.form.descriptionOptional') }}</span>
+        <label for="task-desc" class="mb-1 block text-xs font-medium text-ink-soft">
+          {{ t('tasks.form.descriptionLabel') }} <span class="text-mist">{{ t('tasks.form.descriptionOptional')
+            }}</span>
         </label>
-        <BaseTextarea
-          id="task-desc"
-          v-model="form.description"
-          :rows="3"
-          :placeholder="t('tasks.form.descriptionPlaceholder')"
-        />
+        <BaseTextarea id="task-desc" v-model="form.description" :rows="3"
+          :placeholder="t('tasks.form.descriptionPlaceholder')" />
       </div>
 
       <div class="grid grid-cols-2 gap-3">
         <div>
-          <label for="task-priority" class="mb-1 block text-xs font-medium text-ink-soft dark:text-ink-dark-text-soft">
+          <label for="task-priority" class="mb-1 block text-xs font-medium text-ink-soft">
             {{ t('tasks.form.priorityLabel') }}
           </label>
           <BaseSelect id="task-priority" v-model="form.priority" :options="priorityOptions" />
         </div>
 
         <div>
-          <label for="task-lane" class="mb-1 block text-xs font-medium text-ink-soft dark:text-ink-dark-text-soft">
+          <label for="task-lane" class="mb-1 block text-xs font-medium text-ink-soft">
             {{ t('tasks.form.laneLabel') }}
           </label>
-          <BaseSelect
-            id="task-lane"
-            v-model="form.laneId"
-            :options="lanes.map((l) => ({ value: l.id, label: l.name }))"
-          />
+          <BaseSelect id="task-lane" v-model="form.laneId"
+            :options="lanes.map((l) => ({ value: l.id, label: l.name }))" />
         </div>
       </div>
 

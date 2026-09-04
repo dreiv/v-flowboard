@@ -22,11 +22,10 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
 <template>
   <Teleport to="body">
     <div class="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 p-4" @click.self="emit('close')">
-      <div ref="dialogRef"
-        class="w-full max-w-md rounded-standard border border-mist-light bg-surface p-5 shadow-xl dark:border-ink-dark-border dark:bg-ink-dark-surface"
+      <div ref="dialogRef" class="w-full max-w-md rounded-standard border border-mist-light bg-surface p-5 shadow-xl"
         role="dialog" aria-modal="true" :aria-label="props.title">
         <div class="mb-4 flex items-center justify-between">
-          <h2 class="font-display text-lg text-ink dark:text-ink-dark-text">{{ props.title }}</h2>
+          <h2 class="font-display text-lg text-ink">{{ props.title }}</h2>
           <IconButton :ariaLabel="t('common.buttons.close')" @click="emit('close')">
             ✕
           </IconButton>

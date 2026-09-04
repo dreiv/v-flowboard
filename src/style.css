@@ -1,53 +1,76 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
-  /* Base palette */
-  --color-paper: #f3f2ed;
-  --color-paper-dim: #eae8e1;
-  --color-surface: #ffffff;
-  --color-ink: #20231f;
-  --color-ink-soft: #4a4d46;
-  --color-mist: #8a8d82;
-  --color-mist-light: #d8d6cc;
+  /* Surfaces */
+  --color-paper: light-dark(#f3f2ed, #14201c);
+  --color-paper-dim: light-dark(#eae8e1, #223530);
+  --color-surface: light-dark(#ffffff, #1c2a25);
+
+  /* Text */
+  --color-ink: light-dark(#20231f, #ece9e0);
+  --color-ink-soft: light-dark(#4a4d46, #a9ad9f);
+  --color-mist: light-dark(#8a8d82, #a9ad9f);
+
+  /* Borders */
+  --color-mist-light: light-dark(#d8d6cc, #2e4038);
+
+  /* Accent (pine) — brand color, fixed in both modes */
   --color-pine: #2b5d52;
   --color-pine-dark: #1e3f38;
   --color-pine-light: #e4ede9;
+  --color-link: light-dark(#2b5d52, #e4ede9);
+  --color-accent-soft: light-dark(#e4ede9, #223530);
+  --color-accent-contrast: light-dark(#1e3f38, #e4ede9);
+
+  /* Marker (clay) */
   --color-clay: #b5562b;
   --color-clay-light: #f3e2d7;
 
-  /* Dark mode */
-  --color-ink-dark-bg: #14201c;
-  --color-ink-dark-surface: #1c2a25;
-  --color-ink-dark-surface-2: #223530;
+  /* Priority badges */
+  --color-urgent: #c6432f;
+  --color-urgent-bg: light-dark(#f6e2dd, #c6432f33);
+  --color-urgent-text: light-dark(#c6432f, #fecaca);
+  --color-high: #bd7d2c;
+  --color-high-bg: light-dark(#f4e7d3, #bd7d2c33);
+  --color-high-text: light-dark(#bd7d2c, #fde68a);
+  --color-medium: #35659e;
+  --color-medium-bg: light-dark(#dfe7f0, #35659e33);
+  --color-medium-text: light-dark(#35659e, #bfdbfe);
+  --color-low: #767a72;
+  --color-low-bg: light-dark(#e6e5df, #767a7233);
+  --color-low-text: light-dark(#767a72, #e7e5e4);
+
+  /* Sidebar (always-dark surface) text */
   --color-ink-dark-text: #ece9e0;
   --color-ink-dark-text-soft: #a9ad9f;
-  --color-ink-dark-border: #2e4038;
 
-  /* Priority badges - muted earthy, tuned to the palette */
-  --color-urgent: #c6432f;
-  --color-urgent-bg: #f6e2dd;
-  --color-high: #bd7d2c;
-  --color-high-bg: #f4e7d3;
-  --color-medium: #35659e;
-  --color-medium-bg: #dfe7f0;
-  --color-low: #767a72;
-  --color-low-bg: #e6e5df;
-
-  --font-display: "Fraunces", "Georgia", serif;
-  --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Fraunces', 'Georgia', serif;
+  --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
 
   --radius-standard: 0.375rem;
 }
 
-@custom-variant dark (&:where(.dark, .dark *));
+:root {
+  color-scheme: light dark;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
 
 html {
   font-family: var(--font-body);
 }
 
 body {
-  @apply bg-paper text-ink dark:bg-ink-dark-bg dark:text-ink-dark-text;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  @apply bg-paper text-ink;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
 }
 
 ::selection {
@@ -61,10 +84,6 @@ body {
   scrollbar-color: var(--color-mist-light) transparent;
 }
 
-.dark * {
-  scrollbar-color: var(--color-ink-dark-border) transparent;
-}
-
 /* Visible keyboard focus everywhere */
 :focus-visible {
   outline: 2px solid var(--color-pine);
@@ -73,7 +92,9 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;

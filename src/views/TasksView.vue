@@ -46,8 +46,8 @@ function handleSubmit(payload: TaskFormPayload) {
   <div class="mx-auto max-w-6xl px-8 py-8">
     <header class="mb-6 flex flex-wrap items-start justify-between gap-4">
       <div>
-        <h1 class="font-display text-3xl text-ink dark:text-ink-dark-text">{{ t('tasks.page.title') }}</h1>
-        <p class="mt-1 text-sm text-ink-soft dark:text-ink-dark-text-soft">
+        <h1 class="font-display text-3xl text-ink">{{ t('tasks.page.title') }}</h1>
+        <p class="mt-1 text-sm text-ink-soft">
           {{
             t('tasks.page.summary', {
               count: store.tasks.length,
@@ -62,67 +62,47 @@ function handleSubmit(payload: TaskFormPayload) {
     </header>
 
     <div class="mb-6 flex flex-wrap items-center gap-4">
-      <div class="inline-flex rounded-standard border border-mist-light p-0.5 dark:border-ink-dark-border" role="group" :aria-label="t('tasks.viewToggle.label')">
-        <button
-          type="button"
-          class="rounded-[0.25rem] px-3 py-1.5 text-sm font-medium transition-colors"
+      <div class="inline-flex rounded-standard border border-mist-light p-0.5" role="group"
+        :aria-label="t('tasks.viewToggle.label')">
+        <button type="button" class="rounded-[0.25rem] px-3 py-1.5 text-sm font-medium transition-colors"
           :aria-pressed="store.viewMode === 'list'"
-          :class="store.viewMode === 'list' ? 'bg-pine text-white' : 'text-ink-soft dark:text-ink-dark-text-soft'"
-          @click="store.setViewMode('list')"
-        >
+          :class="store.viewMode === 'list' ? 'bg-pine text-white' : 'text-ink-soft'"
+          @click="store.setViewMode('list')">
           {{ t('tasks.viewToggle.list') }}
         </button>
-        <button
-          type="button"
-          class="rounded-[0.25rem] px-3 py-1.5 text-sm font-medium transition-colors"
+        <button type="button" class="rounded-[0.25rem] px-3 py-1.5 text-sm font-medium transition-colors"
           :aria-pressed="store.viewMode === 'kanban'"
-          :class="store.viewMode === 'kanban' ? 'bg-pine text-white' : 'text-ink-soft dark:text-ink-dark-text-soft'"
-          @click="store.setViewMode('kanban')"
-        >
+          :class="store.viewMode === 'kanban' ? 'bg-pine text-white' : 'text-ink-soft'"
+          @click="store.setViewMode('kanban')">
           {{ t('tasks.viewToggle.kanban') }}
         </button>
       </div>
 
-      <div class="inline-flex rounded-standard border border-mist-light p-0.5 dark:border-ink-dark-border" role="group" :aria-label="t('tasks.sortToggle.label')">
-        <button
-          type="button"
-          class="rounded-[0.25rem] px-3 py-1.5 text-sm font-medium transition-colors"
+      <div class="inline-flex rounded-standard border border-mist-light p-0.5" role="group"
+        :aria-label="t('tasks.sortToggle.label')">
+        <button type="button" class="rounded-[0.25rem] px-3 py-1.5 text-sm font-medium transition-colors"
           :aria-pressed="store.sortMode === 'custom'"
-          :class="store.sortMode === 'custom' ? 'bg-pine text-white' : 'text-ink-soft dark:text-ink-dark-text-soft'"
-          @click="store.setSortMode('custom')"
-        >
+          :class="store.sortMode === 'custom' ? 'bg-pine text-white' : 'text-ink-soft'"
+          @click="store.setSortMode('custom')">
           {{ t('tasks.sortToggle.custom') }}
         </button>
-        <button
-          type="button"
-          class="rounded-[0.25rem] px-3 py-1.5 text-sm font-medium transition-colors"
+        <button type="button" class="rounded-[0.25rem] px-3 py-1.5 text-sm font-medium transition-colors"
           :aria-pressed="store.sortMode === 'priority'"
-          :class="store.sortMode === 'priority' ? 'bg-pine text-white' : 'text-ink-soft dark:text-ink-dark-text-soft'"
-          @click="store.setSortMode('priority')"
-        >
+          :class="store.sortMode === 'priority' ? 'bg-pine text-white' : 'text-ink-soft'"
+          @click="store.setSortMode('priority')">
           {{ t('tasks.sortToggle.priority') }}
         </button>
       </div>
 
-      <p v-if="store.sortMode === 'priority'" class="text-xs text-mist dark:text-ink-dark-text-soft">
+      <p v-if="store.sortMode === 'priority'" class="text-xs text-mist">
         {{ t('tasks.sortToggle.disabledHint') }}
       </p>
     </div>
 
-    <KanbanBoard
-      v-if="store.viewMode === 'kanban'"
-      @edit-task="openEditModal"
-      @add-task="openCreateModal"
-    />
+    <KanbanBoard v-if="store.viewMode === 'kanban'" @edit-task="openEditModal" @add-task="openCreateModal" />
     <TaskListView v-else @edit-task="openEditModal" />
 
-    <TaskFormModal
-      v-if="isModalOpen"
-      :lanes="store.lanes"
-      :editing-task="editingTask"
-      :default-lane-id="defaultLaneId"
-      @close="closeModal"
-      @submit="handleSubmit"
-    />
+    <TaskFormModal v-if="isModalOpen" :lanes="store.lanes" :editing-task="editingTask" :default-lane-id="defaultLaneId"
+      @close="closeModal" @submit="handleSubmit" />
   </div>
 </template>
