@@ -32,11 +32,15 @@ function shiftDay(delta: number) {
 <template>
   <div class="flex w-64 shrink-0 flex-col border-r border-mist-light pr-4">
     <div class="mb-4 flex items-center gap-1">
-      <IconButton :ariaLabel="t('journal.sidebar.previousDay')" @click="shiftDay(-1)">‹</IconButton>
+      <IconButton :ariaLabel="t('journal.sidebar.previousDay')" @click="shiftDay(-1)">
+        <span class="text-xl leading-none" aria-hidden="true">‹</span>
+      </IconButton>
       <BaseButton variant="ghost" class="flex-1 text-center font-medium text-link" @click="goToToday">
         {{ t('journal.sidebar.today') }}
       </BaseButton>
-      <IconButton :ariaLabel="t('journal.sidebar.nextDay')" @click="shiftDay(1)">›</IconButton>
+      <IconButton :ariaLabel="t('journal.sidebar.nextDay')" @click="shiftDay(1)">
+        <span class="text-xl leading-none" aria-hidden="true">›</span>
+      </IconButton>
     </div>
 
     <label for="journal-date-picker" class="mb-1 text-xs font-medium text-ink-soft">

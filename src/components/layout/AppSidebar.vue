@@ -26,7 +26,7 @@ const navItems = [
       <IconButton class="shrink-0 text-ink-dark-text-soft! hover:bg-white/5! hover:text-white!"
         :class="isCollapsed ? 'mx-auto' : ''" :ariaLabel="isCollapsed ? t('nav.expand') : t('nav.collapse')"
         @click="toggle">
-        {{ isCollapsed ? '»' : '«' }}
+        <span class="text-xl leading-none" aria-hidden="true">{{ isCollapsed ? '»' : '«' }}</span>
       </IconButton>
     </div>
     <p v-if="!isCollapsed" class="-mt-6 mb-8 px-1 text-xs text-ink-dark-text-soft">
