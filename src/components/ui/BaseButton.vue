@@ -2,7 +2,7 @@
 // Domain-agnostic button primitive; new looks come from variant/size, not edits here.
 withDefaults(
   defineProps<{
-    variant?: 'primary' | 'secondary' | 'ghost' | 'danger-ghost'
+    variant?: 'primary' | 'secondary' | 'ghost' | 'danger-ghost' | 'link'
     size?: 'sm' | 'md'
     type?: 'button' | 'submit'
     disabled?: boolean
