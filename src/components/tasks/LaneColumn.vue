@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import draggable from 'vuedraggable'
 import { useI18n } from 'vue-i18n'
+import { X } from '@lucide/vue'
 import type { Lane, Task } from '@/types/task'
 import TaskCard from '@/components/tasks/TaskCard.vue'
 import BaseInput from '@/components/ui/BaseInput.vue'
@@ -96,7 +97,7 @@ function cancelRename() {
       <span class="shrink-0 text-xs text-mist">{{ tasks.length }}</span>
       <IconButton v-if="!lane.isDefault" class="px-0! shrink-0 text-xs hover:text-urgent"
         :ariaLabel="t('tasks.board.deleteLaneNamed', { name: lane.name })" @click="emit('remove', lane.id)">
-        ✕
+        <X class="h-4 w-4" aria-hidden="true" />
       </IconButton>
     </div>
 

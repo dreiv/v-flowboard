@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { ChevronLeft, ChevronRight } from '@lucide/vue'
 import { useJournalStore } from '@/stores/journal'
 import { formatDateShort, todayKey, toDateKey } from '@/lib/utils'
 import IconButton from '@/components/ui/IconButton.vue'
@@ -30,16 +31,17 @@ function shiftDay(delta: number) {
 </script>
 
 <template>
-  <div class="flex w-64 shrink-0 flex-col border-r border-mist-light pr-4">
+  <div
+    class="flex w-full shrink-0 flex-col border-b border-mist-light pb-4 md:w-64 md:border-b-0 md:border-r md:pb-0 md:pr-4">
     <div class="mb-4 flex items-center gap-1">
       <IconButton :ariaLabel="t('journal.sidebar.previousDay')" @click="shiftDay(-1)">
-        <span class="text-xl leading-none" aria-hidden="true">‹</span>
+        <ChevronLeft class="h-5 w-5" aria-hidden="true" />
       </IconButton>
       <BaseButton variant="ghost" class="flex-1 text-center font-medium text-link" @click="goToToday">
         {{ t('journal.sidebar.today') }}
       </BaseButton>
       <IconButton :ariaLabel="t('journal.sidebar.nextDay')" @click="shiftDay(1)">
-        <span class="text-xl leading-none" aria-hidden="true">›</span>
+        <ChevronRight class="h-5 w-5" aria-hidden="true" />
       </IconButton>
     </div>
 

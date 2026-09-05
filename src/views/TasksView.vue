@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { List, KanbanSquare } from '@lucide/vue'
 import { useTaskStore } from '@/stores/task'
 import KanbanBoard from '@/components/tasks/KanbanBoard.vue'
 import TaskListView from '@/components/tasks/TaskListView.vue'
@@ -43,7 +44,7 @@ function handleSubmit(payload: TaskFormPayload) {
 </script>
 
 <template>
-  <div class="mx-auto max-w-6xl px-8 py-8">
+  <div class="mx-auto max-w-6xl px-4 py-4 md:px-8 md:py-8">
     <header class="mb-6 flex flex-wrap items-start justify-between gap-4">
       <div>
         <h1 class="font-display text-3xl text-ink">{{ t('tasks.page.title') }}</h1>
@@ -64,16 +65,20 @@ function handleSubmit(payload: TaskFormPayload) {
     <div class="mb-6 flex flex-wrap items-center gap-4">
       <div class="inline-flex rounded-standard border border-mist-light p-0.5" role="group"
         :aria-label="t('tasks.viewToggle.label')">
-        <button type="button" class="rounded-[0.25rem] px-3 py-1.5 text-sm font-medium transition-colors"
+        <button type="button"
+          class="inline-flex items-center gap-1.5 rounded-[0.25rem] px-3 py-1.5 text-sm font-medium transition-colors"
           :aria-pressed="store.viewMode === 'list'"
           :class="store.viewMode === 'list' ? 'bg-pine text-white' : 'text-ink-soft'"
           @click="store.setViewMode('list')">
+          <List class="h-4 w-4" aria-hidden="true" />
           {{ t('tasks.viewToggle.list') }}
         </button>
-        <button type="button" class="rounded-[0.25rem] px-3 py-1.5 text-sm font-medium transition-colors"
+        <button type="button"
+          class="inline-flex items-center gap-1.5 rounded-[0.25rem] px-3 py-1.5 text-sm font-medium transition-colors"
           :aria-pressed="store.viewMode === 'kanban'"
           :class="store.viewMode === 'kanban' ? 'bg-pine text-white' : 'text-ink-soft'"
           @click="store.setViewMode('kanban')">
+          <KanbanSquare class="h-4 w-4" aria-hidden="true" />
           {{ t('tasks.viewToggle.kanban') }}
         </button>
       </div>

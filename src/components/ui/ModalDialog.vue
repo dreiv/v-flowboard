@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { X } from '@lucide/vue'
 import { useFocusTrap } from '@/composables/useFocusTrap'
 import IconButton from '@/components/ui/IconButton.vue'
 
@@ -27,7 +28,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
         <div class="mb-4 flex items-center justify-between">
           <h2 class="font-display text-lg text-ink">{{ props.title }}</h2>
           <IconButton :ariaLabel="t('common.buttons.close')" @click="emit('close')">
-            ✕
+            <X class="h-4 w-4" aria-hidden="true" />
           </IconButton>
         </div>
         <slot />

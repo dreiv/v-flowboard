@@ -8,7 +8,7 @@ const { t } = useI18n()
 </script>
 
 <template>
-  <div class="flex flex-1 flex-col px-8 py-6">
+  <div class="flex flex-1 flex-col px-4 py-4 md:px-8 md:py-6">
     <div class="mb-4 flex items-baseline justify-between">
       <h2 class="font-display text-2xl text-ink">
         {{ formatDateLabel(store.selectedDate) }}

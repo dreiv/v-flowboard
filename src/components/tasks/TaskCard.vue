@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
+import { GripVertical } from '@lucide/vue'
 import type { Lane, Task } from '@/types/task'
 import PriorityBadge from '@/components/tasks/PriorityBadge.vue'
 import BaseSelect from '@/components/ui/BaseSelect.vue'
@@ -27,7 +28,7 @@ const { t } = useI18n()
     :aria-label="task.title">
     <span v-if="draggable" class="drag-handle mt-0.5 shrink-0 cursor-grab select-none text-mist-light"
       aria-hidden="true">
-      ⠿
+      <GripVertical class="h-4 w-4" />
     </span>
 
     <div class="min-w-0 flex-1">
