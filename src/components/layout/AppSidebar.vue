@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted, watch } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { ListTodo, NotebookPen, ChevronsLeft, ChevronsRight, X } from '@lucide/vue'
@@ -22,8 +22,20 @@ function onKeydown(e: KeyboardEvent) {
   if (e.key === 'Escape') close()
 }
 
+watch(
+  isMobileOpen,
+  (open) => {
+    if (typeof document === 'undefined') return
+    document.body.style.overflow = open ? 'hidden' : ''
+  },
+  { immediate: true },
+)
+
 onMounted(() => document.addEventListener('keydown', onKeydown))
-onUnmounted(() => document.removeEventListener('keydown', onKeydown))
+onUnmounted(() => {
+  document.removeEventListener('keydown', onKeydown)
+  document.body.style.overflow = ''
+})
 </script>
 
 <template>
@@ -40,19 +52,21 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown))
         {{ t('nav.brand') }}
       </span>
 
-      <!-- Mobile: close the drawer. -->
-      <IconButton class="shrink-0 text-ink-dark-text-soft! hover:bg-white/5! hover:text-white! md:hidden"
-        :ariaLabel="t('nav.close')" @click="close">
-        <X class="h-5 w-5" aria-hidden="true" />
-      </IconButton>
+      <div class="md:hidden">
+        <IconButton class="shrink-0 text-ink-dark-text-soft! hover:bg-white/5! hover:text-white!"
+          :ariaLabel="t('nav.close')" @click="close">
+          <X class="h-5 w-5" aria-hidden="true" />
+        </IconButton>
+      </div>
 
       <!-- Desktop: collapse/expand the sidebar. -->
-      <IconButton class="hidden shrink-0 text-ink-dark-text-soft! hover:bg-white/5! hover:text-white! md:inline-flex"
-        :class="isCollapsed ? 'mx-auto' : ''" :ariaLabel="isCollapsed ? t('nav.expand') : t('nav.collapse')"
-        @click="toggle">
-        <ChevronsLeft v-if="!isCollapsed" class="h-5 w-5" aria-hidden="true" />
-        <ChevronsRight v-else class="h-5 w-5" aria-hidden="true" />
-      </IconButton>
+      <div class="hidden md:block" :class="isCollapsed ? 'mx-auto' : ''">
+        <IconButton class="shrink-0 text-ink-dark-text-soft! hover:bg-white/5! hover:text-white!"
+          :ariaLabel="isCollapsed ? t('nav.expand') : t('nav.collapse')" @click="toggle">
+          <ChevronsLeft v-if="!isCollapsed" class="h-5 w-5" aria-hidden="true" />
+          <ChevronsRight v-else class="h-5 w-5" aria-hidden="true" />
+        </IconButton>
+      </div>
     </div>
 
     <p class="-mt-6 mb-8 px-1 text-xs text-ink-dark-text-soft" :class="isCollapsed ? 'md:hidden' : ''">

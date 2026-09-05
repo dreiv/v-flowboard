@@ -67,19 +67,21 @@ function handleSubmit(payload: TaskFormPayload) {
         :aria-label="t('tasks.viewToggle.label')">
         <button type="button"
           class="inline-flex items-center gap-1.5 rounded-[0.25rem] px-3 py-1.5 text-sm font-medium transition-colors"
-          :aria-pressed="store.viewMode === 'list'"
+          :aria-pressed="store.viewMode === 'list'" :title="t('tasks.viewToggle.list')"
           :class="store.viewMode === 'list' ? 'bg-pine text-white' : 'text-ink-soft'"
           @click="store.setViewMode('list')">
-          <List class="h-4 w-4" aria-hidden="true" />
-          {{ t('tasks.viewToggle.list') }}
+          <List class="h-4 w-4 shrink-0" aria-hidden="true" />
+          <span class="hidden sm:inline">{{ t('tasks.viewToggle.list') }}</span>
+          <span class="sr-only sm:hidden">{{ t('tasks.viewToggle.list') }}</span>
         </button>
         <button type="button"
           class="inline-flex items-center gap-1.5 rounded-[0.25rem] px-3 py-1.5 text-sm font-medium transition-colors"
-          :aria-pressed="store.viewMode === 'kanban'"
+          :aria-pressed="store.viewMode === 'kanban'" :title="t('tasks.viewToggle.kanban')"
           :class="store.viewMode === 'kanban' ? 'bg-pine text-white' : 'text-ink-soft'"
           @click="store.setViewMode('kanban')">
-          <KanbanSquare class="h-4 w-4" aria-hidden="true" />
-          {{ t('tasks.viewToggle.kanban') }}
+          <KanbanSquare class="h-4 w-4 shrink-0" aria-hidden="true" />
+          <span class="hidden sm:inline">{{ t('tasks.viewToggle.kanban') }}</span>
+          <span class="sr-only sm:hidden">{{ t('tasks.viewToggle.kanban') }}</span>
         </button>
       </div>
 

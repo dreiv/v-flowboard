@@ -32,7 +32,7 @@ function shiftDay(delta: number) {
 
 <template>
   <div
-    class="flex w-full shrink-0 flex-col border-b border-mist-light pb-4 md:w-64 md:border-b-0 md:border-r md:pb-0 md:pr-4">
+    class="flex w-full shrink-0 flex-col border-b border-mist-light pb-4 md:h-full md:w-64 md:border-b-0 md:border-r md:pb-0 md:pr-4">
     <div class="mb-4 flex items-center gap-1">
       <IconButton :ariaLabel="t('journal.sidebar.previousDay')" @click="shiftDay(-1)">
         <ChevronLeft class="h-5 w-5" aria-hidden="true" />
@@ -54,7 +54,8 @@ function shiftDay(delta: number) {
     <p class="mb-2 text-xs font-medium uppercase tracking-wide text-mist">
       {{ t('journal.sidebar.entriesHeading') }}
     </p>
-    <nav class="flex flex-col gap-0.5 overflow-y-auto" :aria-label="t('journal.sidebar.entriesNav')">
+    <nav class="flex max-h-48 flex-1 flex-col gap-0.5 overflow-y-auto md:max-h-none md:min-h-0"
+      :aria-label="t('journal.sidebar.entriesNav')">
       <button v-for="date in recentDates" :key="date" type="button"
         class="rounded-standard px-2 py-1.5 text-left text-sm transition-colors" :class="date === store.selectedDate
           ? 'bg-accent-soft text-accent-contrast'
