@@ -2,7 +2,7 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import { i18n } from '@/i18n'
 
 const router = createRouter({
-  history: createWebHashHistory('/v-todo/'),
+  history: createWebHashHistory('/v-flowboard/'),
   routes: [
     { path: '/', redirect: '/tasks' },
     {
