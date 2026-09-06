@@ -102,7 +102,7 @@ function cancelRename() {
     </div>
 
     <draggable v-model="localTasks" :group="{ name: 'tasks' }" item-key="id" :disabled="!dragEnabled"
-      handle=".drag-handle" ghost-class="opacity-40" class="flex min-h-[3rem] flex-col gap-2" role="list"
+      handle=".drag-handle" ghost-class="opacity-40" class="flex min-h-12 flex-col gap-2" role="list"
       :aria-label="lane.name" @end="onDragEnd">
       <template #item="{ element }">
         <div role="listitem" :data-id="element.id">

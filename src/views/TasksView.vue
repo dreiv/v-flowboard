@@ -67,7 +67,7 @@ function handleSubmit(payload: TaskFormPayload) {
       <div class="inline-flex rounded-standard border border-mist-light p-0.5" role="group"
         :aria-label="t('tasks.viewToggle.label')">
         <button type="button"
-          class="inline-flex items-center gap-1.5 rounded-[0.25rem] px-3 py-1.5 text-sm font-medium transition-colors"
+          class="inline-flex items-center gap-1.5 rounded-sm px-3 py-1.5 text-sm font-medium transition-colors"
           :aria-pressed="store.viewMode === 'list'" :title="t('tasks.viewToggle.list')"
           :class="store.viewMode === 'list' ? 'bg-pine text-white' : 'text-ink-soft'"
           @click="store.setViewMode('list')">
@@ -76,7 +76,7 @@ function handleSubmit(payload: TaskFormPayload) {
           <span class="sr-only sm:hidden">{{ t('tasks.viewToggle.list') }}</span>
         </button>
         <button type="button"
-          class="inline-flex items-center gap-1.5 rounded-[0.25rem] px-3 py-1.5 text-sm font-medium transition-colors"
+          class="inline-flex items-center gap-1.5 rounded-sm px-3 py-1.5 text-sm font-medium transition-colors"
           :aria-pressed="store.viewMode === 'kanban'" :title="t('tasks.viewToggle.kanban')"
           :class="store.viewMode === 'kanban' ? 'bg-pine text-white' : 'text-ink-soft'"
           @click="store.setViewMode('kanban')">
@@ -88,13 +88,13 @@ function handleSubmit(payload: TaskFormPayload) {
 
       <div class="inline-flex rounded-standard border border-mist-light p-0.5" role="group"
         :aria-label="t('tasks.sortToggle.label')">
-        <button type="button" class="rounded-[0.25rem] px-3 py-1.5 text-sm font-medium transition-colors"
+        <button type="button" class="rounded-sm px-3 py-1.5 text-sm font-medium transition-colors"
           :aria-pressed="store.sortMode === 'custom'"
           :class="store.sortMode === 'custom' ? 'bg-pine text-white' : 'text-ink-soft'"
           @click="store.setSortMode('custom')">
           {{ t('tasks.sortToggle.custom') }}
         </button>
-        <button type="button" class="rounded-[0.25rem] px-3 py-1.5 text-sm font-medium transition-colors"
+        <button type="button" class="rounded-sm px-3 py-1.5 text-sm font-medium transition-colors"
           :aria-pressed="store.sortMode === 'priority'"
           :class="store.sortMode === 'priority' ? 'bg-pine text-white' : 'text-ink-soft'"
           @click="store.setSortMode('priority')">
