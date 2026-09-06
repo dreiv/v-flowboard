@@ -52,6 +52,7 @@
 
 :root {
   color-scheme: light dark;
+  interpolate-size: allow-keywords;
 }
 
 :root[data-theme='light'] {
@@ -116,9 +117,25 @@ select,
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
-  *::after {
+  *::after,
+  *::details-content {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
   }
+}
+
+.entries-disclosure::details-content {
+  overflow: hidden;
+  opacity: 0;
+  block-size: 0;
+  transition:
+    content-visibility 0.2s allow-discrete,
+    opacity 0.2s ease,
+    block-size 0.2s ease;
+}
+
+.entries-disclosure[open]::details-content {
+  opacity: 1;
+  block-size: auto;
 }

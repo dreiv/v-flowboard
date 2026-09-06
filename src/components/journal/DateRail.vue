@@ -51,24 +51,29 @@ function shiftDay(delta: number) {
     <BaseInput id="journal-date-picker" type="date" class="mb-4" :model-value="store.selectedDate"
       @update:model-value="store.selectDate" />
 
-    <p class="mb-2 text-xs font-medium uppercase tracking-wide text-mist">
-      {{ t('journal.sidebar.entriesHeading') }}
-    </p>
-    <nav class="flex max-h-48 flex-1 flex-col gap-0.5 overflow-y-auto md:max-h-none md:min-h-0"
-      :aria-label="t('journal.sidebar.entriesNav')">
-      <button v-for="date in recentDates" :key="date" type="button"
-        class="rounded-standard px-2 py-1.5 text-left text-sm transition-colors" :class="date === store.selectedDate
-          ? 'bg-accent-soft text-accent-contrast'
-          : 'text-ink-soft hover:bg-paper-dim'
-          " @click="store.selectDate(date)">
-        <span class="inline-flex items-center gap-1.5">
-          <span v-if="date === today" class="h-1.5 w-1.5 shrink-0 rounded-full bg-clay" aria-hidden="true" />
-          {{ formatDateShort(date) }}
-        </span>
-      </button>
-      <p v-if="recentDates.length === 0" class="px-2 py-1.5 text-xs text-mist">
-        {{ t('journal.sidebar.noEntries') }}
-      </p>
-    </nav>
+    <details class="entries-disclosure group flex flex-col md:min-h-0 md:flex-1" open>
+      <summary
+        class="mb-2 flex cursor-pointer list-none items-center gap-1 text-xs font-medium uppercase tracking-wide text-mist [&::-webkit-details-marker]:hidden">
+        <ChevronRight class="h-3.5 w-3.5 shrink-0 transition-transform duration-150 group-open:rotate-90"
+          aria-hidden="true" />
+        {{ t('journal.sidebar.entriesHeading') }}
+      </summary>
+      <nav class="flex max-h-48 flex-col gap-0.5 overflow-y-auto md:max-h-none md:min-h-0"
+        :aria-label="t('journal.sidebar.entriesNav')">
+        <button v-for="date in recentDates" :key="date" type="button"
+          class="rounded-standard px-2 py-1.5 text-left text-sm transition-colors" :class="date === store.selectedDate
+            ? 'bg-accent-soft text-accent-contrast'
+            : 'text-ink-soft hover:bg-paper-dim'
+            " @click="store.selectDate(date)">
+          <span class="inline-flex items-center gap-1.5">
+            <span v-if="date === today" class="h-1.5 w-1.5 shrink-0 rounded-full bg-clay" aria-hidden="true" />
+            {{ formatDateShort(date) }}
+          </span>
+        </button>
+        <p v-if="recentDates.length === 0" class="px-2 py-1.5 text-xs text-mist">
+          {{ t('journal.sidebar.noEntries') }}
+        </p>
+      </nav>
+    </details>
   </div>
 </template>
