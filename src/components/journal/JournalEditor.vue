@@ -9,7 +9,7 @@ const { t } = useI18n()
 
 <template>
   <div class="flex flex-1 flex-col px-4 py-4 md:px-8 md:py-6">
-    <div class="mb-4 flex items-baseline justify-between">
+    <div class="mb-4 flex shrink-0 items-baseline justify-between">
       <h2 class="font-display text-2xl text-ink">
         {{ formatDateLabel(store.selectedDate) }}
       </h2>
@@ -18,8 +18,10 @@ const { t } = useI18n()
       </span>
     </div>
 
-    <textarea v-model="draft" :placeholder="t('journal.editor.placeholder')"
-      class="min-h-[60vh] flex-1 resize-none rounded-standard border border-mist-light bg-surface p-4 text-[0.95rem] leading-relaxed text-ink outline-none focus:border-pine"
-      @input="handleInput" />
+    <div class="flex-1">
+      <textarea v-model="draft" :placeholder="t('journal.editor.placeholder')"
+        class="min-h-full w-full resize-none rounded-standard border border-mist-light bg-surface p-4 text-[0.95rem] leading-relaxed text-ink outline-none focus:border-pine"
+        style="field-sizing: content" @input="handleInput" />
+    </div>
   </div>
 </template>

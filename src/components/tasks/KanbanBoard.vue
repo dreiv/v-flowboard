@@ -55,7 +55,7 @@ function handleRemoveLane(id: string) {
 </script>
 
 <template>
-  <div>
+  <div class="flex flex-1 flex-col">
     <p class="sr-only" role="status" aria-live="polite">{{ announceMessage }}</p>
 
     <p v-if="store.laneDeleteError"
@@ -67,7 +67,7 @@ function handleRemoveLane(id: string) {
       </BaseButton>
     </p>
 
-    <div class="flex gap-4 overflow-x-auto pb-4">
+    <div class="flex flex-1 gap-4 overflow-x-auto pb-4">
       <LaneColumn v-for="lane in store.lanes" :key="lane.id" :lane="lane" :lanes="store.lanes"
         :tasks="store.tasksForLane(lane.id)" :drag-enabled="store.sortMode === 'custom'"
         @edit="emit('editTask', $event)" @delete="handleDelete" @change-lane="handleChangeLane" @reorder="handleReorder"

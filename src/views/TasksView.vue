@@ -44,7 +44,8 @@ function handleSubmit(payload: TaskFormPayload) {
 </script>
 
 <template>
-  <div class="mx-auto max-w-6xl px-4 py-4 md:px-8 md:py-8">
+  <div class="mx-auto flex min-h-full flex-col px-4 py-4 md:px-8 md:py-8"
+    :class="store.viewMode === 'kanban' ? 'max-w-none' : 'max-w-6xl'">
     <header class="mb-6 flex flex-wrap items-start justify-between gap-4">
       <div>
         <h1 class="font-display text-3xl text-ink">{{ t('tasks.page.title') }}</h1>
@@ -106,8 +107,10 @@ function handleSubmit(payload: TaskFormPayload) {
       </p>
     </div>
 
-    <KanbanBoard v-if="store.viewMode === 'kanban'" @edit-task="openEditModal" @add-task="openCreateModal" />
-    <TaskListView v-else @edit-task="openEditModal" />
+    <div class="flex-1 min-h-0 flex flex-col">
+      <KanbanBoard v-if="store.viewMode === 'kanban'" @edit-task="openEditModal" @add-task="openCreateModal" />
+      <TaskListView v-else @edit-task="openEditModal" />
+    </div>
 
     <TaskFormModal v-if="isModalOpen" :lanes="store.lanes" :editing-task="editingTask" :default-lane-id="defaultLaneId"
       @close="closeModal" @submit="handleSubmit" />

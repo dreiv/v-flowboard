@@ -83,7 +83,7 @@ function cancelRename() {
 </script>
 
 <template>
-  <section class="flex w-72 shrink-0 flex-col border-l-2 border-pine/60 pl-3" :aria-label="lane.name">
+  <section class="flex min-w-72 flex-1 flex-col border-l-2 border-pine/60 pl-3" :aria-label="lane.name">
     <div class="mb-3 flex items-center justify-between gap-2">
       <div class="min-w-0 flex-1">
         <BaseInput v-if="isRenaming" v-model="renameValue" autofocus class="py-0.5! text-sm! font-medium"
@@ -102,7 +102,7 @@ function cancelRename() {
     </div>
 
     <draggable v-model="localTasks" :group="{ name: 'tasks' }" item-key="id" :disabled="!dragEnabled"
-      handle=".drag-handle" ghost-class="opacity-40" class="flex min-h-[3rem] flex-1 flex-col gap-2" role="list"
+      handle=".drag-handle" ghost-class="opacity-40" class="flex min-h-[3rem] flex-col gap-2" role="list"
       :aria-label="lane.name" @end="onDragEnd">
       <template #item="{ element }">
         <div role="listitem" :data-id="element.id">
@@ -116,5 +116,7 @@ function cancelRename() {
       @click="emit('addTask', lane.id)">
       {{ t('tasks.board.addTaskToLane') }}
     </BaseButton>
+
+    <div class="flex-1" aria-hidden="true"></div>
   </section>
 </template>
