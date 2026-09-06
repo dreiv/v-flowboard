@@ -5,7 +5,7 @@ import JournalEditor from '@/components/journal/JournalEditor.vue'
 
 <template>
   <div class="flex h-full flex-col md:flex-row">
-    <div class="py-4 pl-4 md:py-8 md:pl-8">
+    <div class="py-4 pl-4 pr-4 md:py-8 md:pl-8 md:pr-0">
       <DateRail />
     </div>
     <JournalEditor />
