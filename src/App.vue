@@ -13,7 +13,6 @@ const { open } = useMobileSidebar()
   <div class="flex h-screen overflow-hidden">
     <AppSidebar />
     <div class="flex min-w-0 flex-1 flex-col">
-      <!-- Mobile-only top bar; the sidebar becomes an overlay drawer below md. -->
       <header class="flex items-center gap-3 border-b border-mist-light px-3 py-2.5 md:hidden">
         <IconButton :ariaLabel="t('nav.openMenu')" @click="open">
           <Menu class="h-5 w-5" aria-hidden="true" />
